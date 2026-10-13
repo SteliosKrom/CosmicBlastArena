@@ -72,6 +72,28 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 	}
 }
 
+void ACosmicBlastArenaCharacter::ReceiveDamage(float DamageAmount)
+{
+	if (bIsDead) return;
+	if (DamageAmount <= 0.0f) return;
+		
+	CurrentHealth -= DamageAmount;
+	CurrentHealth = FMath::Max(CurrentHealth, 0.0f);
+	
+	if (CurrentHealth <= 0.0f)
+	{
+		Die();
+	}
+}
+
+void ACosmicBlastArenaCharacter::Die()
+{
+	if (bIsDead) return;
+	
+	bIsDead = true;
+	GetCharacterMovement()->DisableMovement();
+}
+
 void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D

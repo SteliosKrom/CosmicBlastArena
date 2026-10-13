@@ -33,7 +33,7 @@ class ACosmicBlastArenaCharacter : public ACharacter
 	
 protected:
 
-	/** Jump Input Action */
+	/** Jump to Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* JumpAction;
 
@@ -52,7 +52,16 @@ protected:
 public:
 
 	/** Constructor */
-	ACosmicBlastArenaCharacter();	
+	ACosmicBlastArenaCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
+	float MaxHealth = 200.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	float CurrentHealth = MaxHealth;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	bool bIsDead = false;
 
 protected:
 
@@ -84,7 +93,13 @@ public:
 	/** Handles jump pressed inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
-
+	
+	UFUNCTION(BlueprintCallable, Category="Health")
+	void ReceiveDamage(float DamageAmount);
+	
+	UFUNCTION(BlueprintCallable, Category="Health")
+	void Die();
+	
 public:
 
 	/** Returns CameraBoom subobject **/
