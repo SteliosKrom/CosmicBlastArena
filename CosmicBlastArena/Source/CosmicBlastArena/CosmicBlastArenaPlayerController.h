@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerController.h"
 #include "CosmicBlastArenaPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -49,4 +48,12 @@ protected:
 	/** Returns true if the player should use UMG touch controls */
 	bool ShouldUseTouchControls() const;
 
+public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	float MinPitch;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	float MaxPitch;
+	
 };

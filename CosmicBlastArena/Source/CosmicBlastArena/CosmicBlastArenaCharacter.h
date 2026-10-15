@@ -100,6 +100,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Health")
 	void Die();
 	
+	void Fire();
+	
 public:
 
 	/** Returns CameraBoom subobject **/

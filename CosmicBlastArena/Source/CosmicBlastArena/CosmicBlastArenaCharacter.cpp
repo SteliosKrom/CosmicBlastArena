@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "CosmicBlastArena.h"
+#include "DrawDebugHelpers.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -74,11 +75,9 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 
 void ACosmicBlastArenaCharacter::ReceiveDamage(float DamageAmount)
 {
-	if (bIsDead) return;
-	if (DamageAmount <= 0.0f) return;
-		
-	CurrentHealth -= DamageAmount;
-	CurrentHealth = FMath::Max(CurrentHealth, 0.0f);
+	if (bIsDead || DamageAmount <= 0.0f) return;
+	
+	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
 	
 	if (CurrentHealth <= 0.0f)
 	{

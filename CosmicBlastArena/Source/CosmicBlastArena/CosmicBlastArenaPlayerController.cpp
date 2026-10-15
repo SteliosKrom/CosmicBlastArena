@@ -8,11 +8,15 @@
 #include "Blueprint/UserWidget.h"
 #include "CosmicBlastArena.h"
 #include "Widgets/Input/SVirtualJoystick.h"
+#include "GameFramework/PlayerController.h"
 
 void ACosmicBlastArenaPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	PlayerCameraManager->ViewPitchMin = MinPitch;
+	PlayerCameraManager->ViewPitchMax = MaxPitch;
+	
 	// only spawn touch controls on local player controllers
 	if (IsLocalPlayerController() && ShouldUseTouchControls())
 	{
@@ -24,10 +28,10 @@ void ACosmicBlastArenaPlayerController::BeginPlay()
 			// add the controls to the player screen
 			MobileControlsWidget->AddToPlayerScreen(0);
 
-		} else {
-
+		} 
+		else 
+		{
 			UE_LOG(LogCosmicBlastArena, Error, TEXT("Could not spawn mobile controls widget."));
-
 		}
 
 	}
