@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "CosmicBlastArenaGameMode.generated.h"
 
+class UMaterialInterface;
+
 /**
  *  Simple GameMode for a third person game
  */
@@ -15,9 +17,18 @@ class ACosmicBlastArenaGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	
 	/** Constructor */
 	ACosmicBlastArenaGameMode();
+	
+protected:
+	virtual void BeginPlay() override;
+	
+public:
+	UPROPERTY(EditDefaultsOnly, Category="Player Materials")
+	TObjectPtr<UMaterialInterface> PlayerOneMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Player Materials")
+	TObjectPtr<UMaterialInterface> PlayerTwoMaterial;
 };
 
 
