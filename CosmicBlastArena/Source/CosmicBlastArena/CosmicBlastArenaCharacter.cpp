@@ -70,12 +70,10 @@ void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (!IsValid(WeaponMesh))
-	{
+	if (!IsValid(WeaponMesh)) 
 		return;
-	}
-	const FName MuzzleSocket(TEXT("Muzzle"));
 	
+	const FName MuzzleSocket = TEXT("Muzzle");
 	const FVector Start = WeaponMesh->GetSocketLocation(MuzzleSocket);
 	const FVector Direction = WeaponMesh->GetSocketRotation(MuzzleSocket).Vector();
 	const FVector End = Start + Direction * 5000.0f;
@@ -86,7 +84,6 @@ void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 	QueryParams.AddIgnoredActor(this);
 	
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
-	
 	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
 	
 	DrawDebugLine(GetWorld(), Start, TraceEnd, bHit ? FColor::Green : FColor::Red, false, 0.0f, 0, 1.0f);
@@ -158,6 +155,24 @@ void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
+	
+	const FName MuzzleSocket = TEXT("Muzzle");
+	const FVector Start = WeaponMesh->GetSocketLocation(MuzzleSocket);
+	const FVector Direction = WeaponMesh->GetSocketRotation(MuzzleSocket).Vector();
+	const FVector End = Start + Direction * 5000.0f;
+	
+	FHitResult HitResult;
+	
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
+	
+	if (bHit)
+	{
+		DrawDebugPoint(GetWorld(), TraceEnd, 10.0f, FColor::Yellow, false, 2.0f, 0.0f);
+	}
 }
 
 void ACosmicBlastArenaCharacter::DoMove(float Right, float Forward)
