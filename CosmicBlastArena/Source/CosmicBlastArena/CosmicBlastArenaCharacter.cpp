@@ -4,6 +4,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
@@ -12,6 +13,7 @@
 #include "InputActionValue.h"
 #include "CosmicBlastArena.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -51,6 +53,45 @@ ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+void ACosmicBlastArenaCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	WeaponMesh = FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("WeaponMesh")));
+
+	if (!IsValid(WeaponMesh) || !WeaponMesh->DoesSocketExist(FName(TEXT("Muzzle"))))
+	{
+		UE_LOG(LogTemp, Error, TEXT("WeaponMesh or Muzzle not found!"));
+		return;
+	}
+}
+
+void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (!IsValid(WeaponMesh))
+	{
+		return;
+	}
+	const FName MuzzleSocket(TEXT("Muzzle"));
+	
+	const FVector Start = WeaponMesh->GetSocketLocation(MuzzleSocket);
+	const FVector Direction = WeaponMesh->GetSocketRotation(MuzzleSocket).Vector();
+	const FVector End = Start + Direction * 5000.0f;
+	
+	FHitResult HitResult;
+	
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
+	
+	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
+	
+	DrawDebugLine(GetWorld(), Start, TraceEnd, bHit ? FColor::Green : FColor::Red, false, 0.0f, 0, 1.0f);
+}
+
 void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -66,6 +107,9 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACosmicBlastArenaCharacter::Look);
+		
+		// Shooting 
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::Shoot);
 	}
 	else
 	{
@@ -109,6 +153,11 @@ void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 
 	// route the input
 	DoLook(LookAxisVector.X, LookAxisVector.Y);
+}
+
+void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
 }
 
 void ACosmicBlastArenaCharacter::DoMove(float Right, float Forward)
