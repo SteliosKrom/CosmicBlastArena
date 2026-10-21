@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Damageable.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "CosmicBlastArenaCharacter.generated.h"
@@ -21,49 +22,60 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  Implements a controllable orbiting camera
  */
 UCLASS(abstract)
-class ACosmicBlastArenaCharacter : public ACharacter
+class ACosmicBlastArenaCharacter : public ACharacter, public IDamageable
 {
 	GENERATED_BODY()
-
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FollowCamera;
-	
-	/** Weapon mesh */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMeshComponent> WeaponMesh = nullptr;
 	
 protected:
 	
-	/** Jump to Input Action */
+	// FUNCTIONS
+	void Move(const FInputActionValue& Value);
+	
+	void Look(const FInputActionValue& Value);
+	
+	void Shoot(const FInputActionValue& Value);
+	
+	// COMPONENTS
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCamera;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMeshComponent> WeaponMesh = nullptr;
+	
+	// PROPERTIES
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* JumpAction;
-
-	/** Move Input Action */
+	
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MoveAction;
-
-	/** Look Input Action */
+	
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* LookAction;
-
-	/** Mouse Look Input Action */
+	
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 	
-	/** Shoot Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
 	UInputAction* ShootAction;
 
 public:
 
-	/** Constructor */
+	/** CONSTRUCTOR */
 	ACosmicBlastArenaCharacter();
 
+	// VIRTUAL FUNCTIONS
+	
+	virtual void BeginPlay() override;
+	
+	virtual void Tick(float DeltaTime) override;
+	
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	// PROPERTIES
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
 	float MaxHealth = 200.0f;
 
@@ -72,54 +84,30 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	bool bIsDead = false;
-
-public:
 	
-	virtual void BeginPlay() override;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	float WeaponDamage = 25.0f;
 	
-	virtual void Tick(float DeltaTime) override;
+	// FUNCTIONS
 	
-protected:
+	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
 	
-	/** Initialize input action bindings */
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	/** Called for movement input */
-	void Move(const FInputActionValue& Value);
-
-	/** Called for looking input */
-	void Look(const FInputActionValue& Value);
-	
-	/** Called for shooting input*/
-	void Shoot(const FInputActionValue& Value);
-
-public:
-
-	/** Handles move inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoMove(float Right, float Forward);
-
-	/** Handles look inputs from either controls or UI interfaces */
+	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoLook(float Yaw, float Pitch);
-
-	/** Handles jump pressed inputs from either controls or UI interfaces */
+	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpStart();
-
-	/** Handles jump pressed inputs from either controls or UI interfaces */
+	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 	
 	UFUNCTION(BlueprintCallable, Category="Health")
-	void ReceiveDamage(float DamageAmount);
-	
-	UFUNCTION(BlueprintCallable, Category="Health")
 	void Die();
-
-	/** Returns CameraBoom subobject **/
+	
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
-	/** Returns FollowCamera subobject **/
+	
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };
