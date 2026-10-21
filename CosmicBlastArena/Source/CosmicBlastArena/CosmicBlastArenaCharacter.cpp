@@ -13,7 +13,6 @@
 #include "InputActionValue.h"
 #include "CosmicBlastArena.h"
 #include "DrawDebugHelpers.h"
-#include "Engine/SkeletalMeshSocket.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -114,9 +113,11 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 	}
 }
 
-void ACosmicBlastArenaCharacter::ReceiveDamage(float DamageAmount)
+void ACosmicBlastArenaCharacter::ReceiveDamage_Implementation(float DamageAmount)
 {
 	if (bIsDead || DamageAmount <= 0.0f) return;
+	
+	UE_LOG(LogTemp, Warning, TEXT("Actor received damage!"));
 	
 	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
 	
@@ -132,6 +133,7 @@ void ACosmicBlastArenaCharacter::Die()
 	
 	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();
+	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
 }
 
 void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
@@ -166,12 +168,23 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& value)
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 	
-	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
 	
 	if (bHit)
 	{
-		DrawDebugPoint(GetWorld(), TraceEnd, 10.0f, FColor::Yellow, false, 2.0f, 0.0f);
+		AActor* HitActor = HitResult.GetActor();
+		
+		if (IsValid(HitActor) && HitActor->Implements<UDamageable>())
+		{
+			IDamageable::Execute_ReceiveDamage(HitActor, WeaponDamage);
+			UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *GetNameSafe(HitActor));
+			DrawDebugPoint(GetWorld(), TraceEnd, 50.0f, FColor::Red, false, 2.0f);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No hit!"));
+		}
 	}
 }
 
