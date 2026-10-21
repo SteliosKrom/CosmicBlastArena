@@ -35,6 +35,8 @@ protected:
 	
 	void Shoot(const FInputActionValue& Value);
 	
+	void Reload(const FInputActionValue& Value);
+	
 	// COMPONENTS
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -58,8 +60,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
+	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ShootAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ReloadAction;
 
 public:
 
@@ -82,11 +87,26 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float CurrentHealth = MaxHealth;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	bool bIsDead = false;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	float WeaponDamage = 25.0f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	int32 MagazineCapacity = 10;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	int32 CurrentAmmo = MagazineCapacity;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	int32 ReserveAmmo = 30;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	int32 SpendAmmoCount = 0;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	bool bIsReloading = false;
 	
 	// FUNCTIONS
 	

@@ -106,6 +106,9 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		
 		// Shooting 
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::Shoot);
+		
+		// Reloading
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::Reload);
 	}
 	else
 	{
@@ -154,9 +157,18 @@ void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 	DoLook(LookAxisVector.X, LookAxisVector.Y);
 }
 
-void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& value)
+void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 {
+	if (CurrentAmmo <= 0)
+		return;
+	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
+	
+	CurrentAmmo = FMath::Clamp(CurrentAmmo - 1, 0, 10);
+	SpendAmmoCount++;
+	
+	UE_LOG(LogTemp, Display, TEXT("Current ammo: %d\n"), CurrentAmmo);
+	UE_LOG(LogTemp, Display, TEXT("Spend ammo: %d\n"), SpendAmmoCount);
 	
 	const FName MuzzleSocket = TEXT("Muzzle");
 	const FVector Start = WeaponMesh->GetSocketLocation(MuzzleSocket);
@@ -185,6 +197,21 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& value)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("No hit!"));
 		}
+	}
+}
+
+void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
+{
+	if (CurrentAmmo <= 0 && ReserveAmmo > 0)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Reload pressed!"));
+		
+		CurrentAmmo = MagazineCapacity;
+		bIsReloading = true;
+		ReserveAmmo = FMath::Clamp(ReserveAmmo -= SpendAmmoCount, 0, 30);
+		SpendAmmoCount = 0;
+		
+		UE_LOG(LogTemp, Warning, TEXT("ReserveAmmo: %d\n"), ReserveAmmo);
 	}
 }
 
