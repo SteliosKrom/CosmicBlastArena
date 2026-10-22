@@ -91,7 +91,7 @@ public:
 	bool bIsDead = false;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
-	float WeaponDamage = 25.0f;
+	int Damage = 0;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 MagazineCapacity = 10;

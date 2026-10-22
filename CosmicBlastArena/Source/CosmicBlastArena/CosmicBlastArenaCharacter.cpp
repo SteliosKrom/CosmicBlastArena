@@ -189,13 +189,27 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 		
 		if (IsValid(HitActor) && HitActor->Implements<UDamageable>())
 		{
-			IDamageable::Execute_ReceiveDamage(HitActor, WeaponDamage);
+			if (bIsDead == true)
+				return;
+			
+			if (HitResult.BoneName == "head")
+			{
+				UE_LOG(LogTemp, Warning, TEXT("That was a headshot!"));
+				Damage = 50;
+				UE_LOG(LogTemp, Display, TEXT("Head shot damage: %d"), Damage);
+			}
+			else
+			{
+				Damage = FMath::RandRange(7, 13);
+			}
+			
+			IDamageable::Execute_ReceiveDamage(HitActor, Damage);
 			UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *GetNameSafe(HitActor));
 			DrawDebugPoint(GetWorld(), TraceEnd, 50.0f, FColor::Red, false, 2.0f);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("No hit!"));
+			UE_LOG(LogTemp, Warning, TEXT("No hit!"))
 		}
 	}
 }
