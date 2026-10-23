@@ -134,6 +134,15 @@ void ACosmicBlastArenaCharacter::ReceiveDamage_Implementation(float DamageAmount
 
 void ACosmicBlastArenaCharacter::Die()
 {
+	if (!IsValid(DeathMontage))
+		return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if (!IsValid(AnimInstance))
+		return;
+	
+	AnimInstance->Montage_Play(DeathMontage);
 	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
 	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();

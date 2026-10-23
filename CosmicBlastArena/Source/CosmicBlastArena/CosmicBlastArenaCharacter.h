@@ -51,6 +51,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> ReloadMontage;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
+	TObjectPtr<UAnimMontage> DeathMontage;
+	
 	// PROPERTIES
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* JumpAction;
