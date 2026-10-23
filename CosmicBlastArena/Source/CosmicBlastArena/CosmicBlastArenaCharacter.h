@@ -112,6 +112,8 @@ public:
 	
 	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
 	
+	virtual bool IsAlive_Implementation() override;
+	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoMove(float Right, float Forward);
 	

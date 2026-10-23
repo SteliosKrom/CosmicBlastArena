@@ -22,4 +22,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
 	void ReceiveDamage(float DamageAmount);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
+	bool IsAlive();
 };

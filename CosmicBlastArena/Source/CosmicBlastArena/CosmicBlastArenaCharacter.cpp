@@ -118,7 +118,7 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 
 void ACosmicBlastArenaCharacter::ReceiveDamage_Implementation(float DamageAmount)
 {
-	if (bIsDead || DamageAmount <= 0.0f) return;
+	if (bIsDead == true) return;
 	
 	UE_LOG(LogTemp, Warning, TEXT("Actor received damage!"));
 	
@@ -132,11 +132,14 @@ void ACosmicBlastArenaCharacter::ReceiveDamage_Implementation(float DamageAmount
 
 void ACosmicBlastArenaCharacter::Die()
 {
-	if (bIsDead) return;
-	
+	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
 	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();
-	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
+}
+
+bool ACosmicBlastArenaCharacter::IsAlive_Implementation()
+{
+	return !bIsDead;
 }
 
 void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
@@ -189,9 +192,9 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 		
 		if (IsValid(HitActor) && HitActor->Implements<UDamageable>())
 		{
-			if (bIsDead == true)
+			if (!IDamageable::Execute_IsAlive(HitActor))
 				return;
-			
+				
 			if (HitResult.BoneName == "head")
 			{
 				UE_LOG(LogTemp, Warning, TEXT("That was a headshot!"));
@@ -200,7 +203,9 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 			}
 			else
 			{
+				UE_LOG(LogTemp, Warning, TEXT("That was a body shot!"));
 				Damage = FMath::RandRange(7, 13);
+				UE_LOG(LogTemp, Display, TEXT("Body shot damage: %d"), Damage);
 			}
 			
 			IDamageable::Execute_ReceiveDamage(HitActor, Damage);
