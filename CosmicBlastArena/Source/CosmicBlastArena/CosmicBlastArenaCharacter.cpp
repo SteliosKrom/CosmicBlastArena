@@ -13,6 +13,8 @@
 #include "InputActionValue.h"
 #include "CosmicBlastArena.h"
 #include "DrawDebugHelpers.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -221,12 +223,23 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 
 void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 {
+	if (!IsValid(ReloadMontage))
+		return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if (!IsValid(AnimInstance))
+		return;
+	
 	if (CurrentAmmo <= 0 && ReserveAmmo > 0)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Reload pressed!"));
 		
-		CurrentAmmo = MagazineCapacity;
 		bIsReloading = true;
+		
+		AnimInstance->Montage_Play(ReloadMontage);
+		
+		CurrentAmmo = MagazineCapacity;
 		ReserveAmmo = FMath::Clamp(ReserveAmmo -= SpendAmmoCount, 0, 30);
 		SpendAmmoCount = 0;
 		
