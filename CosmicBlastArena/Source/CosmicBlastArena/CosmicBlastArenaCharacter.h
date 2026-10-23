@@ -12,6 +12,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 class USkeletalMeshComponent;
+class UAnimMontage;
 
 struct FInputActionValue;
 
@@ -46,6 +47,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
+	TObjectPtr<UAnimMontage> ReloadMontage;
 	
 	// PROPERTIES
 	UPROPERTY(EditAnywhere, Category="Input")
