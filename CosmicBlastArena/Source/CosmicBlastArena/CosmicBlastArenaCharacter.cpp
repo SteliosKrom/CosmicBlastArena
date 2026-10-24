@@ -65,14 +65,24 @@ void ACosmicBlastArenaCharacter::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("WeaponMesh or Muzzle not found!"));
 		return;
 	}
+	
+	if (IsValid(FollowCamera))
+	{
+		CurrentFOV = DefaultCameraFOV;
+		FollowCamera->SetFieldOfView(CurrentFOV);
+	}
 }
 
 void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (!IsValid(WeaponMesh)) 
-		return;
+	if (!IsValid(WeaponMesh)) return;
+	if (!IsValid(FollowCamera)) return;
+	
+	const float TargetFOV = bIsAiming ? AimCameraFOV : DefaultCameraFOV;
+	CurrentFOV = FMath::FInterpTo(CurrentFOV, TargetFOV, DeltaTime, FOVInterpSpeed);
+	FollowCamera->SetFieldOfView(CurrentFOV);
 	
 	const FName MuzzleSocket = TEXT("Muzzle");
 	const FVector Start = WeaponMesh->GetSocketLocation(MuzzleSocket);
@@ -111,6 +121,10 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		
 		// Reloading
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::Reload);
+		
+		// Aiming 
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::OnAimStarted);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ACosmicBlastArenaCharacter::OnAimReleased);
 	}
 	else
 	{
@@ -253,6 +267,26 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 		SpendAmmoCount = 0;
 		
 		UE_LOG(LogTemp, Warning, TEXT("ReserveAmmo: %d\n"), ReserveAmmo);
+	}
+}
+
+void ACosmicBlastArenaCharacter::OnAimStarted(const FInputActionValue& Value)
+{
+	bIsAiming = true;
+	
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Aim started!"));
+	}
+}
+
+void ACosmicBlastArenaCharacter::OnAimReleased(const FInputActionValue& Value)
+{
+	bIsAiming = false;
+	
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Aim ended!"));
 	}
 }
 
