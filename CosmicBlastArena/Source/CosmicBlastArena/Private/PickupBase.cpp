@@ -1,8 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PickupBase.h"
+
+#include "CosmicBlastArenaCharacter.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APickupBase::APickupBase()
@@ -41,6 +44,18 @@ void APickupBase::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	if (OtherActor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Pickup overlapped by: %s"), *OtherActor->GetName());
+		ACosmicBlastArenaCharacter* ArenaCharacter = Cast<ACosmicBlastArenaCharacter>(OtherActor);
+		
+		if (!IsValid(ArenaCharacter)) return;
+		
+		if (ArenaCharacter->CurrentHealth >= ArenaCharacter->MaxHealth)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("You have full health %f. You cannot heal!"), ArenaCharacter->CurrentHealth);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Pickup overlapped by: %s"), *OtherActor->GetName());
+			ArenaCharacter->CurrentHealth += ArenaCharacter->HealthBoost;
+		}
 	}
 }

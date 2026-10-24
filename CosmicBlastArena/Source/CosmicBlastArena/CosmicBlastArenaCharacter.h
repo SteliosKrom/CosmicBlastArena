@@ -109,31 +109,34 @@ public:
 	
 	// PROPERTIES
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float MaxHealth = 200.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float CurrentHealth = MaxHealth;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	float HealthBoost = 50.0f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	bool bIsDead = false;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	int Damage = 0;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
 	int32 MagazineCapacity = 10;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
 	int32 CurrentAmmo = MagazineCapacity;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
 	int32 ReserveAmmo = 30;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
 	int32 SpendAmmoCount = 0;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
 	bool bIsReloading = false;
 	
 	// FUNCTIONS
