@@ -29,6 +29,10 @@ class ACosmicBlastArenaCharacter : public ACharacter, public IDamageable
 	
 protected:
 	
+	virtual void BeginPlay() override;
+	
+	virtual void Tick(float DeltaTime) override;
+	
 	// FUNCTIONS
 	void Move(const FInputActionValue& Value);
 	
@@ -38,12 +42,16 @@ protected:
 	
 	void Reload(const FInputActionValue& Value);
 	
+	void OnAimStarted(const FInputActionValue& Value);
+	
+	void OnAimReleased(const FInputActionValue& Value);
+	
 	// COMPONENTS
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FollowCamera;
+	TObjectPtr<UCameraComponent> FollowCamera;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh = nullptr;
@@ -71,18 +79,31 @@ protected:
 	UInputAction* ShootAction;
 	
 	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* AimAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ReloadAction;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	float DefaultCameraFOV = 90.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	float AimCameraFOV = 60.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
+	float FOVInterpSpeed = 20.0f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
+	bool bIsAiming = false;
+	
+	float CurrentFOV;
+	
 public:
 
 	/** CONSTRUCTOR */
 	ACosmicBlastArenaCharacter();
 
 	// VIRTUAL FUNCTIONS
-	
-	virtual void BeginPlay() override;
-	
-	virtual void Tick(float DeltaTime) override;
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
