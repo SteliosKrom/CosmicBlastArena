@@ -125,6 +125,10 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		// Aiming 
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::OnAimStarted);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ACosmicBlastArenaCharacter::OnAimReleased);
+		
+		// Throwing 
+		EnhancedInputComponent->BindAction(ThrowGrenadeAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::OnThrowPrepare);
+		EnhancedInputComponent->BindAction(ThrowGrenadeAction, ETriggerEvent::Completed, this, &ACosmicBlastArenaCharacter::OnThrowReleased);
 	}
 	else
 	{
@@ -268,6 +272,74 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Display, TEXT("Reload pressed!"));
 		bIsReloading = true;
 		AnimInstance->Montage_Play(ReloadMontage);
+	}
+}
+
+void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
+{
+	if (!IsValid(ThrowMontage)) return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if (!IsValid(AnimInstance)) return;
+	
+	bIsGrenadeHolding = false;
+	
+	AnimInstance->Montage_Play(ThrowMontage);
+	
+	bThrowButtonHeld = true;
+	
+	if (bThrowButtonHeld == false)
+	{
+		AnimInstance->Montage_Stop(1.0f, ThrowMontage);
+	}
+	
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Throw started!"));
+	}
+}
+
+void ACosmicBlastArenaCharacter::OnThrowHold()
+{
+	if (!IsValid(ThrowMontage)) return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if (!IsValid(AnimInstance)) return;
+	
+	bIsGrenadeHolding = true;
+	AnimInstance->Montage_Pause(ThrowMontage);
+	
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Throw is in hold!"));
+	}
+}
+
+void ACosmicBlastArenaCharacter::OnThrowReleased(const FInputActionValue& Value)
+{
+	if (!IsValid(ThrowMontage)) return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if (!IsValid(AnimInstance)) return;
+	
+	bThrowButtonHeld = false;
+	
+	if (bIsGrenadeHolding)
+	{
+		bIsGrenadeHolding = false;
+		AnimInstance->Montage_Resume(ThrowMontage);
+	}
+	else
+	{
+		AnimInstance->Montage_Stop(0.2f, ThrowMontage);
+	}
+	
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Throw ended!"));
 	}
 }
 

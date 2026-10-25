@@ -33,8 +33,6 @@ protected:
 	
 	virtual void Tick(float DeltaTime) override;
 	
-	// FUNCTIONS
-	
 	void Move(const FInputActionValue& Value);
 	
 	void Look(const FInputActionValue& Value);
@@ -47,7 +45,10 @@ protected:
 	
 	void OnAimReleased(const FInputActionValue& Value);
 	
-	// COMPONENTS
+	void OnThrowPrepare(const FInputActionValue& Value);
+	
+	void OnThrowReleased(const FInputActionValue& Value);
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 	
@@ -63,7 +64,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> DeathMontage;
 	
-	// PROPERTIES
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
+	TObjectPtr<UAnimMontage> ThrowMontage;
+	
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* JumpAction;
 	
@@ -85,6 +88,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* ReloadAction;
 	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ThrowGrenadeAction;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
 	float DefaultCameraFOV = 90.0f;
 	
@@ -103,52 +109,53 @@ public:
 
 	/** CONSTRUCTOR */
 	ACosmicBlastArenaCharacter();
-
-	// FUNCTIONS
 	
 	void FinishReload();
 	
-	// VIRTUAL FUNCTIONS
+	void OnThrowHold();
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
+	virtual bool IsAlive_Implementation() override;
 	
-	// PROPERTIES
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float MaxHealth = 200.0f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float CurrentHealth = MaxHealth;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float HealthBoost = 50.0f;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	bool bIsDead = false;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	int Damage = 0;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 MagazineCapacity = 10;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 CurrentAmmo = MagazineCapacity;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 ReserveAmmo = 30;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 SpendAmmoCount = 0;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	bool bIsReloading = false;
 	
-	// FUNCTIONS
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
+	//bool bIsThrowing = false;
 	
-	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
+	bool bThrowButtonHeld = false;
 	
-	virtual bool IsAlive_Implementation() override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
+	bool bIsGrenadeHolding = false;
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoMove(float Right, float Forward);
