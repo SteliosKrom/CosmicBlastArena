@@ -187,8 +187,8 @@ void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 
 void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 {
-	if (CurrentAmmo <= 0)
-		return;
+	if (CurrentAmmo <= 0) return;
+	if (bIsReloading == true) return;
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
 	
@@ -244,29 +244,30 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 	}
 }
 
+void ACosmicBlastArenaCharacter::FinishReload()
+{
+	CurrentAmmo = MagazineCapacity;
+	ReserveAmmo = FMath::Clamp(ReserveAmmo -= SpendAmmoCount, 0, 30);
+	SpendAmmoCount = 0;
+	bIsReloading = false;
+	UE_LOG(LogTemp, Warning, TEXT("ReserveAmmo: %d\n"), ReserveAmmo);
+}
+
 void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 {
-	if (!IsValid(ReloadMontage))
-		return;
+	if (!IsValid(ReloadMontage)) return;
 	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	
-	if (!IsValid(AnimInstance))
-		return;
+	if (!IsValid(AnimInstance)) return;
+	
+	if (bIsReloading == true) return;
 	
 	if (CurrentAmmo <= 0 && ReserveAmmo > 0)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Reload pressed!"));
-		
 		bIsReloading = true;
-		
 		AnimInstance->Montage_Play(ReloadMontage);
-		
-		CurrentAmmo = MagazineCapacity;
-		ReserveAmmo = FMath::Clamp(ReserveAmmo -= SpendAmmoCount, 0, 30);
-		SpendAmmoCount = 0;
-		
-		UE_LOG(LogTemp, Warning, TEXT("ReserveAmmo: %d\n"), ReserveAmmo);
 	}
 }
 
