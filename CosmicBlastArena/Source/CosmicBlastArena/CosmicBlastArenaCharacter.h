@@ -34,6 +34,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	
 	// FUNCTIONS
+	
 	void Move(const FInputActionValue& Value);
 	
 	void Look(const FInputActionValue& Value);
@@ -103,6 +104,10 @@ public:
 	/** CONSTRUCTOR */
 	ACosmicBlastArenaCharacter();
 
+	// FUNCTIONS
+	
+	void FinishReload();
+	
 	// VIRTUAL FUNCTIONS
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
