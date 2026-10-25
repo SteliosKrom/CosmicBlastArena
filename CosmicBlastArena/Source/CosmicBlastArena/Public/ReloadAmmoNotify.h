@@ -15,7 +15,7 @@ class COSMICBLASTARENA_API UReloadAmmoNotify : public UAnimNotify
 	
 public:
 	
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& Reference);
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& Reference) override;
 };
 
 
