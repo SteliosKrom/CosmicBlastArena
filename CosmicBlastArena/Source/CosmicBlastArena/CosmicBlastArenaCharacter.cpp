@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -15,6 +16,7 @@
 #include "DrawDebugHelpers.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
+#include "Blueprint/UserWidget.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -57,6 +59,21 @@ ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 void ACosmicBlastArenaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (IsLocallyControlled() && PlayerHUDClass != nullptr)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		
+		if (PC != nullptr)
+		{
+			UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(PC, PlayerHUDClass);
+			
+			if (PlayerHUD != nullptr)
+			{
+				PlayerHUD->AddToPlayerScreen();
+			}
+		}
+	}
 	
 	WeaponMesh = FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("WeaponMesh")));
 
@@ -214,8 +231,6 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 	
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
-	
-	DrawDebugLine(GetWorld(), Start, TraceEnd, FColor::Green, false, 2.0f);
 	
 	if (bHit)
 	{
