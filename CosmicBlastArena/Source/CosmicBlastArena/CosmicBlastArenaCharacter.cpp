@@ -94,9 +94,10 @@ void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 	
+	if (bIsDead == true) return;
+
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
-	
 	DrawDebugLine(GetWorld(), Start, TraceEnd, bHit ? FColor::Green : FColor::Red, false, 0.0f, 0, 1.0f);
 }
 
@@ -106,11 +107,14 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACosmicBlastArenaCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Canceled, this, &ACosmicBlastArenaCharacter::OnMoveCompleted);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ACosmicBlastArenaCharacter::OnMoveCompleted);
+		
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ACosmicBlastArenaCharacter::Look);
 
 		// Looking
@@ -171,17 +175,29 @@ bool ACosmicBlastArenaCharacter::IsAlive_Implementation()
 	return !bIsDead;
 }
 
+void ACosmicBlastArenaCharacter::OnMoveCompleted(const FInputActionValue& Value)
+{
+	bIsMoving = false;
+}
+
 void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
 {
+	if (bIsThrowing == true) return;
+	if (bIsDead == true) return;
+	
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	
+	bIsMoving = !MovementVector.IsNearlyZero();
+	
 	// route the input
 	DoMove(MovementVector.X, MovementVector.Y);
 }
 
 void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 {
+	if (bIsDead == true) return;
+	
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -192,7 +208,8 @@ void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 {
 	if (CurrentAmmo <= 0) return;
-	if (bIsReloading == true) return;
+	if (bIsReloading == true || bIsThrowing == true || bIsMoving == true) return;
+	if (bIsDead == true) return;
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
 	
@@ -264,8 +281,8 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	
 	if (!IsValid(AnimInstance)) return;
-	
-	if (bIsReloading == true) return;
+	if (bIsReloading == true || bIsThrowing == true) return;
+	if (bIsDead == true) return;
 	
 	if (CurrentAmmo <= 0 && ReserveAmmo > 0)
 	{
@@ -277,6 +294,9 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 
 void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
 {
+	if (bIsReloading == true) return;
+	if (bIsDead == true) return;
+	
 	if (!IsValid(ThrowMontage)) return;
 	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -284,15 +304,10 @@ void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
 	if (!IsValid(AnimInstance)) return;
 	
 	bIsGrenadeHolding = false;
+	bThrowButtonHeld = true;
+	bIsThrowing = true;
 	
 	AnimInstance->Montage_Play(ThrowMontage);
-	
-	bThrowButtonHeld = true;
-	
-	if (bThrowButtonHeld == false)
-	{
-		AnimInstance->Montage_Stop(1.0f, ThrowMontage);
-	}
 	
 	if (GEngine)
 	{
@@ -308,6 +323,7 @@ void ACosmicBlastArenaCharacter::OnThrowHold()
 	
 	if (!IsValid(AnimInstance)) return;
 	
+	bIsThrowing = true;
 	bIsGrenadeHolding = true;
 	AnimInstance->Montage_Pause(ThrowMontage);
 	
@@ -331,9 +347,11 @@ void ACosmicBlastArenaCharacter::OnThrowReleased(const FInputActionValue& Value)
 	{
 		bIsGrenadeHolding = false;
 		AnimInstance->Montage_Resume(ThrowMontage);
+		bIsThrowing = false;
 	}
 	else
 	{
+		bIsThrowing = false;
 		AnimInstance->Montage_Stop(0.2f, ThrowMontage);
 	}
 	
@@ -343,8 +361,17 @@ void ACosmicBlastArenaCharacter::OnThrowReleased(const FInputActionValue& Value)
 	}
 }
 
+void ACosmicBlastArenaCharacter::OnThrowFinished()
+{
+	bIsGrenadeHolding = false;
+	bIsThrowing = false;
+	bThrowButtonHeld = false;
+}
+
 void ACosmicBlastArenaCharacter::OnAimStarted(const FInputActionValue& Value)
 {
+	if (bIsDead == true) return;
+	
 	bIsAiming = true;
 	
 	if (GEngine)
@@ -355,6 +382,8 @@ void ACosmicBlastArenaCharacter::OnAimStarted(const FInputActionValue& Value)
 
 void ACosmicBlastArenaCharacter::OnAimReleased(const FInputActionValue& Value)
 {
+	if (bIsDead == true) return;
+	
 	bIsAiming = false;
 	
 	if (GEngine)
@@ -395,6 +424,8 @@ void ACosmicBlastArenaCharacter::DoLook(float Yaw, float Pitch)
 
 void ACosmicBlastArenaCharacter::DoJumpStart()
 {
+	if (bIsThrowing == true) return;
+	
 	// signal the character to jump
 	Jump();
 }

@@ -7,6 +7,7 @@
 #include "ReloadAmmoNotify.generated.h"
 
 class USkeletalMeshComponent;
+class UAnimSequence;
 
 UCLASS()
 class COSMICBLASTARENA_API UReloadAmmoNotify : public UAnimNotify
