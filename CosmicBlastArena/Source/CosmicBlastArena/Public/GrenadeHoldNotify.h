@@ -7,6 +7,7 @@
 #include "GrenadeHoldNotify.generated.h"
 
 class USkeletalMeshComponent;
+class UAnimSequenceBase;
 
 UCLASS()
 class COSMICBLASTARENA_API UGrenadeHoldNotify : public UAnimNotify

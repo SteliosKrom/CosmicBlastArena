@@ -35,6 +35,8 @@ protected:
 	
 	void Move(const FInputActionValue& Value);
 	
+	void OnMoveCompleted(const FInputActionValue& Value);
+	
 	void Look(const FInputActionValue& Value);
 	
 	void Shoot(const FInputActionValue& Value);
@@ -67,8 +69,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> ThrowMontage;
 	
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* JumpAction;
+	//UPROPERTY(EditAnywhere, Category="Input")
+	//UInputAction* JumpAction;
 	
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MoveAction;
@@ -114,8 +116,12 @@ public:
 	
 	void OnThrowHold();
 	
+	void OnThrowFinished();
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
 	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
+	
 	virtual bool IsAlive_Implementation() override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
@@ -148,14 +154,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	bool bIsReloading = false;
 	
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
-	//bool bIsThrowing = false;
+ 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
+ 	bool bIsThrowing = false;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
 	bool bThrowButtonHeld = false;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
 	bool bIsGrenadeHolding = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
+	bool bIsMoving = false;
 	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoMove(float Right, float Forward);
