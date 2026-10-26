@@ -1,0 +1,32 @@
+{
+	"FileVersion": 3,
+	"Version": 2,
+	"VersionName": "1.1.0",
+	"FriendlyName": "DualSense Gamepad Support",
+	"Description": "Native PlayStation controller support (PS3, PS4 DualShock 4, PS5 DualSense) for Windows, powered by SDL3. Plug and play with Enhanced Input",
+	"Category": "Input",
+	"CreatedBy": "David Sanchez",
+	"CreatedByURL": "",
+	"DocsURL": "https://jet-harmony-ee6.notion.site/NOTION_DOCS-32ac1f5f455f80afa038c227fa871f4c?source=copy_link",
+	"MarketplaceURL": "",
+	"SupportURL": "dxmasdesign@gmail.com",
+	"EngineVersion": "5.8.0",
+	"CanContainContent": false,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "DualSenseGamepadSupport",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"PlatformAllowList": [
+				"Win64"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		}
+	]
+}
