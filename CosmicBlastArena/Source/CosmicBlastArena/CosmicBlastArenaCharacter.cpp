@@ -83,29 +83,13 @@ void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 	const float TargetFOV = bIsAiming ? AimCameraFOV : DefaultCameraFOV;
 	CurrentFOV = FMath::FInterpTo(CurrentFOV, TargetFOV, DeltaTime, FOVInterpSpeed);
 	FollowCamera->SetFieldOfView(CurrentFOV);
-	
-	const FName MuzzleSocket = TEXT("Muzzle");
-	const FVector Start = WeaponMesh->GetSocketLocation(MuzzleSocket);
-	const FVector Direction = WeaponMesh->GetSocketRotation(MuzzleSocket).Vector();
-	const FVector End = Start + Direction * 5000.0f;
-	
-	FHitResult HitResult;
-	
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-	
-	if (bIsDead == true) return;
-
-	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
-	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
-	DrawDebugLine(GetWorld(), Start, TraceEnd, bHit ? FColor::Green : FColor::Red, false, 0.0f, 0, 1.0f);
 }
 
 void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
 		// Jumping
 		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -219,9 +203,8 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 	UE_LOG(LogTemp, Display, TEXT("Current ammo: %d\n"), CurrentAmmo);
 	UE_LOG(LogTemp, Display, TEXT("Spend ammo: %d\n"), SpendAmmoCount);
 	
-	const FName MuzzleSocket = TEXT("Muzzle");
-	const FVector Start = WeaponMesh->GetSocketLocation(MuzzleSocket);
-	const FVector Direction = WeaponMesh->GetSocketRotation(MuzzleSocket).Vector();
+	const FVector Start = FollowCamera->GetComponentLocation();
+	const FVector Direction = FollowCamera->GetForwardVector();
 	const FVector End = Start + Direction * 5000.0f;
 	
 	FHitResult HitResult;
