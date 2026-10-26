@@ -215,6 +215,8 @@ void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
 	
+	DrawDebugLine(GetWorld(), Start, TraceEnd, FColor::Green, false, 2.0f);
+	
 	if (bHit)
 	{
 		AActor* HitActor = HitResult.GetActor();
