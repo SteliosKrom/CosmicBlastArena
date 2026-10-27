@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Damageable.h"
 #include "GameFramework/Character.h"
+#include "TimerManager.h"
 #include "Logging/LogMacros.h"
 #include "CosmicBlastArenaCharacter.generated.h"
 
@@ -34,13 +35,15 @@ protected:
 	
 	virtual void Tick(float DeltaTime) override;
 	
+	virtual void PossessedBy(AController* NewController) override;
+	
 	void Move(const FInputActionValue& Value);
 	
 	void OnMoveCompleted(const FInputActionValue& Value);
 	
 	void Look(const FInputActionValue& Value);
 	
-	void Shoot(const FInputActionValue& Value);
+	void Shoot();
 	
 	void Reload(const FInputActionValue& Value);
 	
@@ -106,15 +109,26 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
 	float FOVInterpSpeed = 20.0f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
+	float FireRate = 0.2f;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
 	bool bIsAiming = false;
 	
 	float CurrentFOV;
 	
+	FTimerHandle ShootingTimerHandle;
+	
 public:
 
 	/** CONSTRUCTOR */
 	ACosmicBlastArenaCharacter();
+	
+	void InitializePlayerHUD();
+	
+	void StartShooting();
+	
+	void StopShooting();
 	
 	void FinishReload();
 	

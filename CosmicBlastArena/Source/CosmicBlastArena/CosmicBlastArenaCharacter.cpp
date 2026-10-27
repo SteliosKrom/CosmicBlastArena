@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CosmicBlastArenaCharacter.h"
-#include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -56,24 +55,24 @@ ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+void ACosmicBlastArenaCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	
+	APlayerController* PC = Cast<APlayerController>(NewController);
+	
+	if (!IsValid(PC)) return;
+		
+	UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(PC, PlayerHUDClass);
+	
+	if (!IsValid(PlayerHUD)) return;
+	
+	PlayerHUD->AddToPlayerScreen();
+}
+
 void ACosmicBlastArenaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (IsLocallyControlled() && PlayerHUDClass != nullptr)
-	{
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		
-		if (PC != nullptr)
-		{
-			UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(PC, PlayerHUDClass);
-			
-			if (PlayerHUD != nullptr)
-			{
-				PlayerHUD->AddToPlayerScreen();
-			}
-		}
-	}
 	
 	WeaponMesh = FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("WeaponMesh")));
 
@@ -122,7 +121,8 @@ void ACosmicBlastArenaCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACosmicBlastArenaCharacter::Look);
 		
 		// Shooting 
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::Shoot);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::StartShooting);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &ACosmicBlastArenaCharacter::StopShooting);
 		
 		// Reloading
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &ACosmicBlastArenaCharacter::Reload);
@@ -206,7 +206,20 @@ void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 	DoLook(LookAxisVector.X, LookAxisVector.Y);
 }
 
-void ACosmicBlastArenaCharacter::Shoot(const FInputActionValue& Value)
+void ACosmicBlastArenaCharacter::StartShooting()
+{
+	if (GetWorldTimerManager().IsTimerActive(ShootingTimerHandle)) return;
+	
+	Shoot();
+	GetWorldTimerManager().SetTimer(ShootingTimerHandle, this, &ACosmicBlastArenaCharacter::Shoot, FireRate, true);
+}
+
+void ACosmicBlastArenaCharacter::StopShooting()
+{
+	GetWorldTimerManager().ClearTimer(ShootingTimerHandle);
+}
+
+void ACosmicBlastArenaCharacter::Shoot()
 {
 	if (CurrentAmmo <= 0) return;
 	if (bIsReloading == true || bIsThrowing == true || bIsMoving == true) return;
