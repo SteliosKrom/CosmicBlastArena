@@ -18,6 +18,8 @@ class UUserWidget;
 
 struct FInputActionValue;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, CurrentHealth, float, MaxHealth);
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 /**
@@ -67,6 +69,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="UI")
 	TSubclassOf<UUserWidget> PlayerHUDClass;
 	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> PlayerHUD;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> ReloadMontage;
 	
@@ -109,11 +114,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
 	float FOVInterpSpeed = 20.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
-	float FireRate = 0.2f;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
 	bool bIsAiming = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
+	float FireRate = 0.2f;
 	
 	float CurrentFOV;
 	
@@ -139,6 +144,9 @@ public:
 	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
 	
 	virtual bool IsAlive_Implementation() override;
+	
+	UPROPERTY(BlueprintAssignable, Category="Health")
+	FOnHealthChanged OnHealthChanged;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float MaxHealth = 200.0f;
