@@ -124,8 +124,6 @@ public:
 	/** CONSTRUCTOR */
 	ACosmicBlastArenaCharacter();
 	
-	void InitializePlayerHUD();
-	
 	void StartShooting();
 	
 	void StopShooting();
