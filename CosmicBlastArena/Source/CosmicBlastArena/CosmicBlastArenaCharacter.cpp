@@ -63,7 +63,7 @@ void ACosmicBlastArenaCharacter::PossessedBy(AController* NewController)
 	
 	if (!IsValid(PC)) return;
 		
-	UUserWidget* PlayerHUD = CreateWidget<UUserWidget>(PC, PlayerHUDClass);
+	PlayerHUD = CreateWidget<UUserWidget>(PC, PlayerHUDClass);
 	
 	if (!IsValid(PlayerHUD)) return;
 	
@@ -148,6 +148,7 @@ void ACosmicBlastArenaCharacter::ReceiveDamage_Implementation(float DamageAmount
 	UE_LOG(LogTemp, Warning, TEXT("Actor received damage!"));
 	
 	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
+	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);
 	
 	if (CurrentHealth <= 0.0f)
 	{
