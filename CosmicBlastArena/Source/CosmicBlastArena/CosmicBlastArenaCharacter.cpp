@@ -20,7 +20,7 @@
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
 	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
 		
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -228,8 +228,10 @@ void ACosmicBlastArenaCharacter::Shoot()
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
 	
-	CurrentAmmo = FMath::Clamp(CurrentAmmo - 1, 0, 10);
+	CurrentAmmo = FMath::Clamp(CurrentAmmo - 1, 0, 30);
 	SpendAmmoCount++;
+	
+	OnShoot.Broadcast(CurrentAmmo, ReserveAmmo);
 	
 	UE_LOG(LogTemp, Display, TEXT("Current ammo: %d\n"), CurrentAmmo);
 	UE_LOG(LogTemp, Display, TEXT("Spend ammo: %d\n"), SpendAmmoCount);
@@ -282,9 +284,10 @@ void ACosmicBlastArenaCharacter::Shoot()
 void ACosmicBlastArenaCharacter::FinishReload()
 {
 	CurrentAmmo = MagazineCapacity;
-	ReserveAmmo = FMath::Clamp(ReserveAmmo -= SpendAmmoCount, 0, 30);
+	ReserveAmmo = FMath::Clamp(ReserveAmmo -= SpendAmmoCount, 0, 120);
 	SpendAmmoCount = 0;
 	bIsReloading = false;
+	OnReloading.Broadcast(CurrentAmmo, ReserveAmmo);
 	UE_LOG(LogTemp, Warning, TEXT("ReserveAmmo: %d\n"), ReserveAmmo);
 }
 
