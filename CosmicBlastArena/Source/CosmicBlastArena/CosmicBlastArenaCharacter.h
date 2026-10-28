@@ -19,6 +19,9 @@ class UUserWidget;
 struct FInputActionValue;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, CurrentHealth, float, MaxHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReloading, float, CurrentAmmo, float, ReserveAmmo);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShoot, float, CurrentAmmo, float, ReserveAmmo);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -118,7 +121,7 @@ protected:
 	bool bIsAiming = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
-	float FireRate = 0.2f;
+	float FireRate = 0.12f;
 	
 	float CurrentFOV;
 	
@@ -145,8 +148,14 @@ public:
 	
 	virtual bool IsAlive_Implementation() override;
 	
+	UPROPERTY(BlueprintAssignable, Category="Reload")
+	FOnReloading OnReloading;
+	
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChanged OnHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="Ammo")
+	FOnShoot OnShoot;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float MaxHealth = 200.0f;
@@ -164,13 +173,13 @@ public:
 	int Damage = 0;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
-	int32 MagazineCapacity = 10;
+	int32 MagazineCapacity = 30;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 CurrentAmmo = MagazineCapacity;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
-	int32 ReserveAmmo = 30;
+	int32 ReserveAmmo = 120;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 SpendAmmoCount = 0;

@@ -25,6 +25,15 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> HealthTextBlock;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> AmmoTextBlock;
+	
 	UFUNCTION()
 	void UpdateHealthUI(float CurrentHealth, float MaxHealth);
+	
+	UFUNCTION()
+	void UpdateFullAmmoUI(float CurrentAmmo, float ReserveAmmo);
+	
+	UFUNCTION()
+	void UpdateCurrentAmmoUI(float CurrentAmmo, float ReserveAmmo);
 };
