@@ -20,6 +20,8 @@
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
 		
@@ -70,7 +72,6 @@ void ACosmicBlastArenaCharacter::PossessedBy(AController* NewController)
 	if (!IsValid(PlayerHUD)) return;
 	
 	PlayerHUD->AddToPlayerScreen();
-	HUD->UpdateTimerUI();
 }
 
 void ACosmicBlastArenaCharacter::BeginPlay()
@@ -98,14 +99,13 @@ void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 	
 	Timer += DeltaTime;
 	
-	while (Timer >= 1.0f)
+	if (Timer >= 1.0f)
 	{
-		Timer -= 1.0f;
-		
 		if (IsValid(HUD))
 		{
 			HUD->UpdateTimerUI();
 		}
+		Timer = 0.0f;
 	}
 	
 	if (!IsValid(WeaponMesh)) return;
@@ -182,6 +182,7 @@ void ACosmicBlastArenaCharacter::Die()
 		return;
 	
 	AnimInstance->Montage_Play(DeathMontage);
+	Dying();
 	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
 	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();
@@ -242,6 +243,14 @@ void ACosmicBlastArenaCharacter::Shoot()
 	if (bIsDead == true) return;
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
+	
+	if (!IsValid(ShootMontage)) return;
+	
+	UAnimInstance* AnimInstance = GetMesh() -> GetAnimInstance();
+	
+	if (!IsValid(AnimInstance)) return;
+	
+	AnimInstance->Montage_Play(ShootMontage);
 	
 	CurrentAmmo = FMath::Clamp(CurrentAmmo - 1, 0, 30);
 	SpendAmmoCount++;

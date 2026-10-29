@@ -49,7 +49,7 @@ void APickupBase::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		
 		if (ArenaCharacter->CurrentHealth >= ArenaCharacter->MaxHealth)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("You have full health %f. You cannot heal!"), ArenaCharacter->CurrentHealth);
+			UE_LOG(LogTemp, Warning, TEXT("You have full health %.2f. You cannot heal!"), ArenaCharacter->CurrentHealth);
 		}
 		else
 		{

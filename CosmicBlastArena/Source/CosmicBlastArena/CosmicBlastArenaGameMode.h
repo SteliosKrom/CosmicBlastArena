@@ -26,11 +26,11 @@ protected:
 	virtual void BeginPlay() override;
 	
 	virtual void Tick(float DeltaTime) override;
-	
+
 public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Timer")
-	float RoundTimeRemaining = 180.0f;
+	float RoundTimeRemaining;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player Materials")
 	TObjectPtr<UMaterialInterface> PlayerOneMaterial;

@@ -88,6 +88,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> ThrowMontage;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
+	TObjectPtr<UAnimMontage> ShootMontage;
+	
+	UFUNCTION(BlueprintImplementableEvent, Category="Animation")
+	void Dying();
+	
 	//UPROPERTY(EditAnywhere, Category="Input")
 	//UInputAction* JumpAction;
 	
@@ -129,7 +135,7 @@ protected:
 	
 	float CurrentFOV;
 	
-	float Timer;
+	float Timer = 0.0f;
 	
 	FTimerHandle ShootingTimerHandle;
 	

@@ -32,12 +32,16 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 	{
 		PlayerTwoCharacter->GetMesh()->SetMaterial(1, PlayerTwoMaterial);
 	}
+	
+	RoundTimeRemaining = 180.0f;
 }
 
 void ACosmicBlastArenaGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	RoundTimeRemaining = FMath::Max(RoundTimeRemaining - DeltaTime, 0.0f);
+	
+	if (RoundTimeRemaining >= 0.0f)
+		RoundTimeRemaining -=  DeltaTime;
 }
 
 
