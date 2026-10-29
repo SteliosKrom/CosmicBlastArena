@@ -8,7 +8,7 @@
 
 ACosmicBlastArenaGameMode::ACosmicBlastArenaGameMode()
 {
-	
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ACosmicBlastArenaGameMode::BeginPlay()
@@ -32,6 +32,12 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 	{
 		PlayerTwoCharacter->GetMesh()->SetMaterial(1, PlayerTwoMaterial);
 	}
+}
+
+void ACosmicBlastArenaGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	RoundTimeRemaining = FMath::Max(RoundTimeRemaining - DeltaTime, 0.0f);
 }
 
 

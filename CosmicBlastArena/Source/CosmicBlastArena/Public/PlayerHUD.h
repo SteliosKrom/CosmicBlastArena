@@ -28,6 +28,9 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> AmmoTextBlock;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> TimerTextBlock;
+	
 	UFUNCTION()
 	void UpdateHealthUI(float CurrentHealth, float MaxHealth);
 	
@@ -36,4 +39,7 @@ public:
 	
 	UFUNCTION()
 	void UpdateCurrentAmmoUI(float CurrentAmmo, float ReserveAmmo);
+	
+	UFUNCTION()
+	void UpdateTimerUI();
 };

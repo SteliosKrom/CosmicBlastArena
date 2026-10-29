@@ -16,6 +16,7 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Blueprint/UserWidget.h"
+#include "PlayerHUD.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -64,10 +65,12 @@ void ACosmicBlastArenaCharacter::PossessedBy(AController* NewController)
 	if (!IsValid(PC)) return;
 		
 	PlayerHUD = CreateWidget<UUserWidget>(PC, PlayerHUDClass);
+	HUD = Cast<UPlayerHUD>(PlayerHUD);
 	
 	if (!IsValid(PlayerHUD)) return;
 	
 	PlayerHUD->AddToPlayerScreen();
+	HUD->UpdateTimerUI();
 }
 
 void ACosmicBlastArenaCharacter::BeginPlay()
@@ -92,6 +95,18 @@ void ACosmicBlastArenaCharacter::BeginPlay()
 void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	Timer += DeltaTime;
+	
+	while (Timer >= 1.0f)
+	{
+		Timer -= 1.0f;
+		
+		if (IsValid(HUD))
+		{
+			HUD->UpdateTimerUI();
+		}
+	}
 	
 	if (!IsValid(WeaponMesh)) return;
 	if (!IsValid(FollowCamera)) return;
