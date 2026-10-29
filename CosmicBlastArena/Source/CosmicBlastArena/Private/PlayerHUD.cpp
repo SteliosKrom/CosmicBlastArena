@@ -2,6 +2,7 @@
 
 #include "PlayerHUD.h"
 #include "CosmicBlastArenaCharacter.h"
+#include "CosmicBlastArenaGameMode.h"
 
 void UPlayerHUD::NativeConstruct()
 {
@@ -20,7 +21,7 @@ void UPlayerHUD::NativeConstruct()
 	UpdateCurrentAmmoUI(PlayerCharacter->CurrentAmmo, PlayerCharacter->ReserveAmmo);
 }
 
-void UPlayerHUD::UpdateHealthUI(float CurrentHealth, float MaxHealth) 
+void UPlayerHUD::UpdateHealthUI(float CurrentHealth, float MaxHealth)
 {
 	if (!IsValid(HealthProgressBar) || MaxHealth <= 0.0f) return;
 	
@@ -30,7 +31,7 @@ void UPlayerHUD::UpdateHealthUI(float CurrentHealth, float MaxHealth)
 		FText::AsNumber(FMath::RoundToInt(CurrentHealth)), FText::AsNumber(FMath::RoundToInt(MaxHealth))));
 }
 
-void UPlayerHUD::UpdateFullAmmoUI(float CurrentAmmo, float ReserveAmmo)
+void UPlayerHUD::UpdateFullAmmoUI(float CurrentAmmo, float ReserveAmmo) 
 {
 	if (!IsValid(AmmoTextBlock)) return;
 	
@@ -44,4 +45,21 @@ void UPlayerHUD::UpdateCurrentAmmoUI(float CurrentAmmo, float ReserveAmmo)
 	
 	AmmoTextBlock->SetText(FText::Format(FText::FromString(TEXT("{0} / {1}")), 
 		FText::AsNumber(FMath::RoundToInt(CurrentAmmo)), FText::AsNumber(ReserveAmmo)));
+}
+
+void UPlayerHUD::UpdateTimerUI()
+{
+	if (!IsValid(TimerTextBlock)) return;
+	
+	ACosmicBlastArenaGameMode* GameMode = Cast<ACosmicBlastArenaGameMode>(GetWorld()->GetAuthGameMode());
+	
+	if (!IsValid(GameMode)) return;
+	
+	int32 Minutes = FMath::FloorToInt(GameMode->RoundTimeRemaining / 60.0f);
+	int32 Seconds = FMath::FloorToInt(GameMode->RoundTimeRemaining) % 60;
+	
+	FString TimerString = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+	TimerTextBlock->SetText(FText::FromString(TimerString));
+	
+	UE_LOG(LogTemp, Warning, TEXT("RoundTimeRemaining: %02d:%02d"), Minutes, Seconds);
 }

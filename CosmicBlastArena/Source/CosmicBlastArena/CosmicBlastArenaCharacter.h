@@ -15,6 +15,7 @@ class UInputAction;
 class USkeletalMeshComponent;
 class UAnimMontage;
 class UUserWidget;
+class UPlayerHUD;
 
 struct FInputActionValue;
 
@@ -75,6 +76,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UUserWidget> PlayerHUD;
 	
+	UPROPERTY()
+	TObjectPtr<UPlayerHUD> HUD;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> ReloadMontage;
 	
@@ -124,6 +128,8 @@ protected:
 	float FireRate = 0.12f;
 	
 	float CurrentFOV;
+	
+	float Timer;
 	
 	FTimerHandle ShootingTimerHandle;
 	
