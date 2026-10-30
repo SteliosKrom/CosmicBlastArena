@@ -88,9 +88,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TObjectPtr<UAnimMontage> ThrowMontage;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
-	TObjectPtr<UAnimMontage> ShootMontage;
-	
 	UFUNCTION(BlueprintImplementableEvent, Category="Animation")
 	void Dying();
 	
@@ -134,9 +131,7 @@ protected:
 	float FireRate = 0.12f;
 	
 	float CurrentFOV;
-	
 	float Timer = 0.0f;
-	
 	FTimerHandle ShootingTimerHandle;
 	
 public:
@@ -166,9 +161,6 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChanged OnHealthChanged;
 	
-	UPROPERTY(BlueprintAssignable, Category="Ammo")
-	FOnShoot OnShoot;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float MaxHealth = 200.0f;
 
@@ -183,6 +175,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	int Damage = 0;
+	
+	UPROPERTY(BlueprintAssignable, Category="Ammo")
+	FOnShoot OnShoot;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 MagazineCapacity = 30;
@@ -208,7 +203,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
 	bool bIsGrenadeHolding = false;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player")
 	bool bIsMoving = false;
 	
 	UFUNCTION(BlueprintCallable, Category="Input")

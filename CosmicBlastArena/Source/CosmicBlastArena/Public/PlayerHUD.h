@@ -8,6 +8,9 @@
 #include "Components/TextBlock.h"
 #include "PlayerHUD.generated.h"
 
+class UProgressBar;
+class UTextBlock;
+
 UCLASS()
 class COSMICBLASTARENA_API UPlayerHUD : public UUserWidget
 {
@@ -31,6 +34,9 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> TimerTextBlock;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> ReloadingTextBlock;
+	
 	UFUNCTION()
 	void UpdateHealthUI(float CurrentHealth, float MaxHealth);
 	
@@ -42,4 +48,10 @@ public:
 	
 	UFUNCTION()
 	void UpdateTimerUI();
+	
+	UFUNCTION()
+	void ShowReloadingUI();
+	
+	UFUNCTION()
+	void HideReloadingUI();
 };
