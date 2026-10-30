@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Components/CanvasPanel.h"
 #include "PlayerHUD.generated.h"
 
 class UProgressBar;
@@ -37,6 +38,12 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> ReloadingTextBlock;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCanvasPanel> GameplayHUD;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> RoundIntroTextBlock;
+	
 	UFUNCTION()
 	void UpdateHealthUI(float CurrentHealth, float MaxHealth);
 	
@@ -54,4 +61,16 @@ public:
 	
 	UFUNCTION()
 	void HideReloadingUI();
+	
+	UFUNCTION()
+	void ShowGameplayHUD();
+	
+	UFUNCTION()
+	void HideGameplayHUD();
+	
+	UFUNCTION()
+	void ShowRoundAnnouncementUI();
+	
+	UFUNCTION()
+	void HideRoundAnnouncementUI();
 };

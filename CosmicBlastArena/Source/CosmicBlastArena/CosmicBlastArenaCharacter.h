@@ -16,6 +16,7 @@ class USkeletalMeshComponent;
 class UAnimMontage;
 class UUserWidget;
 class UPlayerHUD;
+class ACosmicBlastArenaGameMode;
 
 struct FInputActionValue;
 
@@ -139,6 +140,8 @@ public:
 	/** CONSTRUCTOR */
 	ACosmicBlastArenaCharacter();
 	
+	UPlayerHUD* GetPlayerHUD() const { return HUD; };
+	
 	void StartShooting();
 	
 	void StopShooting();
@@ -154,6 +157,9 @@ public:
 	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
 	
 	virtual bool IsAlive_Implementation() override;
+	
+	UPROPERTY()
+	TObjectPtr<ACosmicBlastArenaGameMode> GameMode;
 	
 	UPROPERTY(BlueprintAssignable, Category="Reload")
 	FOnReloading OnReloading;

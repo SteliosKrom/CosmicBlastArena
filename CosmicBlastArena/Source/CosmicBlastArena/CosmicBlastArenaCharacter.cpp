@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CosmicBlastArenaCharacter.h"
+#include "CosmicBlastArenaGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -78,6 +79,7 @@ void ACosmicBlastArenaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GameMode = Cast<ACosmicBlastArenaGameMode>(GetWorld()->GetAuthGameMode());
 	WeaponMesh = FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("WeaponMesh")));
 
 	if (!IsValid(WeaponMesh) || !WeaponMesh->DoesSocketExist(FName(TEXT("Muzzle"))))
@@ -202,6 +204,7 @@ void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
 {
 	if (bIsThrowing == true) return;
 	if (bIsDead == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -215,6 +218,7 @@ void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
 void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 {
 	if (bIsDead == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -241,6 +245,7 @@ void ACosmicBlastArenaCharacter::Shoot()
 	if (CurrentAmmo <= 0) return;
 	if (bIsReloading == true || bIsThrowing == true || bIsMoving == true) return;
 	if (bIsDead == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
 	
@@ -317,6 +322,7 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 	if (!IsValid(AnimInstance)) return;
 	if (bIsReloading == true || bIsThrowing == true) return;
 	if (bIsDead == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	if (CurrentAmmo <= 0 && ReserveAmmo > 0)
 	{
@@ -331,6 +337,7 @@ void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
 {
 	if (bIsReloading == true) return;
 	if (bIsDead == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	if (!IsValid(ThrowMontage)) return;
 	
@@ -406,6 +413,7 @@ void ACosmicBlastArenaCharacter::OnThrowFinished()
 void ACosmicBlastArenaCharacter::OnAimStarted(const FInputActionValue& Value)
 {
 	if (bIsDead == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	bIsAiming = true;
 	
@@ -418,6 +426,7 @@ void ACosmicBlastArenaCharacter::OnAimStarted(const FInputActionValue& Value)
 void ACosmicBlastArenaCharacter::OnAimReleased(const FInputActionValue& Value)
 {
 	if (bIsDead == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	bIsAiming = false;
 	
@@ -460,6 +469,7 @@ void ACosmicBlastArenaCharacter::DoLook(float Yaw, float Pitch)
 void ACosmicBlastArenaCharacter::DoJumpStart()
 {
 	if (bIsThrowing == true) return;
+	if (GameMode->bRoundStarted == false) return;
 	
 	// signal the character to jump
 	Jump();

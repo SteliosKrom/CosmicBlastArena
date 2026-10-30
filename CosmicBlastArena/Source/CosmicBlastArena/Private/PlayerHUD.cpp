@@ -75,3 +75,27 @@ void UPlayerHUD::HideReloadingUI()
 	if (!IsValid(ReloadingTextBlock)) return;
 	ReloadingTextBlock->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UPlayerHUD::ShowGameplayHUD()
+{
+	if (!IsValid(GameplayHUD)) return;
+	GameplayHUD->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UPlayerHUD::HideGameplayHUD()
+{
+	if (!IsValid(GameplayHUD)) return;
+	GameplayHUD->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UPlayerHUD::ShowRoundAnnouncementUI()
+{
+	if (!IsValid(RoundIntroTextBlock)) return;
+	RoundIntroTextBlock->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UPlayerHUD::HideRoundAnnouncementUI()
+{
+	if (!IsValid(RoundIntroTextBlock)) return;
+	RoundIntroTextBlock->SetVisibility(ESlateVisibility::Hidden);
+}
