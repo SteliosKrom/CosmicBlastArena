@@ -338,6 +338,7 @@ void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
 	if (bIsReloading == true) return;
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (CurrentGrenade <= 0) return;
 	
 	if (!IsValid(ThrowMontage)) return;
 	
@@ -390,6 +391,8 @@ void ACosmicBlastArenaCharacter::OnThrowReleased(const FInputActionValue& Value)
 		bIsGrenadeHolding = false;
 		AnimInstance->Montage_Resume(ThrowMontage);
 		bIsThrowing = false;
+		CurrentGrenade = FMath::Clamp(CurrentGrenade - 1, 0, MaxGrenades);
+		HUD->UpdateGrenadesUI(CurrentGrenade);
 	}
 	else
 	{

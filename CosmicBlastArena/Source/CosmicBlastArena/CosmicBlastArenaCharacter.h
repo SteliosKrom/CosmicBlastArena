@@ -209,6 +209,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
 	bool bIsGrenadeHolding = false;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
+	int32 MaxGrenades = 3;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Grenade")
+	int32 CurrentGrenade = MaxGrenades;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player")
 	bool bIsMoving = false;
 	
