@@ -7,6 +7,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
+#include "CosmicBlastArenaCharacter.h"
 #include "PlayerHUD.generated.h"
 
 class UProgressBar;
@@ -44,6 +45,12 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> RoundIntroTextBlock;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> GrenadeTextBlock;
+	
+	UPROPERTY()
+	TObjectPtr<ACosmicBlastArenaCharacter> PlayerCharacter;
+	
 	UFUNCTION()
 	void UpdateHealthUI(float CurrentHealth, float MaxHealth);
 	
@@ -52,6 +59,9 @@ public:
 	
 	UFUNCTION()
 	void UpdateCurrentAmmoUI(float CurrentAmmo, float ReserveAmmo);
+	
+	UFUNCTION()
+	void UpdateGrenadesUI(int32 CurrentGrenade);
 	
 	UFUNCTION()
 	void UpdateTimerUI();

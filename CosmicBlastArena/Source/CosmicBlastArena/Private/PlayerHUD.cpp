@@ -8,7 +8,7 @@ void UPlayerHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	ACosmicBlastArenaCharacter* PlayerCharacter = Cast<ACosmicBlastArenaCharacter>(GetOwningPlayerPawn());
+	PlayerCharacter = Cast<ACosmicBlastArenaCharacter>(GetOwningPlayerPawn());
 	
 	if (!IsValid(PlayerCharacter)) return;
 	
@@ -62,6 +62,12 @@ void UPlayerHUD::UpdateTimerUI()
 	TimerTextBlock->SetText(FText::FromString(TimerString));
 	
 	UE_LOG(LogTemp, Warning, TEXT("RoundTimeRemaining: %02d:%02d"), Minutes, Seconds);
+}
+
+void UPlayerHUD::UpdateGrenadesUI(int32 CurrentGrenade)
+{
+	if (!IsValid(GrenadeTextBlock)) return;
+	GrenadeTextBlock->SetText(FText::AsNumber(PlayerCharacter->CurrentGrenade));
 }
 
 void UPlayerHUD::ShowReloadingUI() 
