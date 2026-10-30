@@ -244,14 +244,6 @@ void ACosmicBlastArenaCharacter::Shoot()
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
 	
-	if (!IsValid(ShootMontage)) return;
-	
-	UAnimInstance* AnimInstance = GetMesh() -> GetAnimInstance();
-	
-	if (!IsValid(AnimInstance)) return;
-	
-	AnimInstance->Montage_Play(ShootMontage);
-	
 	CurrentAmmo = FMath::Clamp(CurrentAmmo - 1, 0, 30);
 	SpendAmmoCount++;
 	
@@ -312,6 +304,7 @@ void ACosmicBlastArenaCharacter::FinishReload()
 	SpendAmmoCount = 0;
 	bIsReloading = false;
 	OnReloading.Broadcast(CurrentAmmo, ReserveAmmo);
+	HUD->HideReloadingUI();
 	UE_LOG(LogTemp, Warning, TEXT("ReserveAmmo: %d\n"), ReserveAmmo);
 }
 
@@ -330,6 +323,7 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Display, TEXT("Reload pressed!"));
 		bIsReloading = true;
 		AnimInstance->Montage_Play(ReloadMontage);
+		HUD->ShowReloadingUI();
 	}
 }
 

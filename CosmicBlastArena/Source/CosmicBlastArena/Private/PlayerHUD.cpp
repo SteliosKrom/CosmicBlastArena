@@ -6,7 +6,7 @@
 
 void UPlayerHUD::NativeConstruct()
 {
-	Super::Construct();
+	Super::NativeConstruct();
 	
 	ACosmicBlastArenaCharacter* PlayerCharacter = Cast<ACosmicBlastArenaCharacter>(GetOwningPlayerPawn());
 	
@@ -62,4 +62,16 @@ void UPlayerHUD::UpdateTimerUI()
 	TimerTextBlock->SetText(FText::FromString(TimerString));
 	
 	UE_LOG(LogTemp, Warning, TEXT("RoundTimeRemaining: %02d:%02d"), Minutes, Seconds);
+}
+
+void UPlayerHUD::ShowReloadingUI() 
+{
+	if (!IsValid(ReloadingTextBlock)) return;
+	ReloadingTextBlock->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UPlayerHUD::HideReloadingUI()
+{
+	if (!IsValid(ReloadingTextBlock)) return;
+	ReloadingTextBlock->SetVisibility(ESlateVisibility::Hidden);
 }
