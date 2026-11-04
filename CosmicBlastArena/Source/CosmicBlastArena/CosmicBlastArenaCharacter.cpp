@@ -188,6 +188,7 @@ void ACosmicBlastArenaCharacter::Die()
 	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
 	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();
+	GameMode->HandlePlayerDeath();
 }
 
 bool ACosmicBlastArenaCharacter::IsAlive_Implementation()
@@ -205,6 +206,7 @@ void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
 	if (bIsThrowing == true) return;
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -219,6 +221,7 @@ void ACosmicBlastArenaCharacter::Look(const FInputActionValue& Value)
 {
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -246,6 +249,7 @@ void ACosmicBlastArenaCharacter::Shoot()
 	if (bIsReloading == true || bIsThrowing == true || bIsMoving == true) return;
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
 	
@@ -323,6 +327,7 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 	if (bIsReloading == true || bIsThrowing == true) return;
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	
 	if (CurrentAmmo <= 0 && ReserveAmmo > 0)
 	{
@@ -338,6 +343,7 @@ void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
 	if (bIsReloading == true) return;
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	if (CurrentGrenade <= 0) return;
 	
 	if (!IsValid(ThrowMontage)) return;
@@ -417,6 +423,7 @@ void ACosmicBlastArenaCharacter::OnAimStarted(const FInputActionValue& Value)
 {
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	
 	bIsAiming = true;
 	
@@ -430,6 +437,7 @@ void ACosmicBlastArenaCharacter::OnAimReleased(const FInputActionValue& Value)
 {
 	if (bIsDead == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	
 	bIsAiming = false;
 	
@@ -473,6 +481,7 @@ void ACosmicBlastArenaCharacter::DoJumpStart()
 {
 	if (bIsThrowing == true) return;
 	if (GameMode->bRoundStarted == false) return;
+	if (GameMode->bRoundFinished == true) return;
 	
 	// signal the character to jump
 	Jump();

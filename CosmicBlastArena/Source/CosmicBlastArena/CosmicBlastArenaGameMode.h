@@ -9,6 +9,7 @@
 
 class UMaterialInterface;
 class UPlayerHUD;
+class APlayerStart;
 
 /**
  *  Simple GameMode for a third person game
@@ -31,20 +32,50 @@ protected:
 
 public:
 	
-	UPROPERTY(VisibleAnywhere)
-	bool bRoundStarted = false;
-	
 	FTimerHandle InitialDelayHandle;
 	FTimerHandle RoundIntroHandle;
+	FTimerHandle EndRoundHandle;
+	FTimerHandle RoundTransitionTimer;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Timer")
-	float RoundTimeRemaining;
+	int32 PlayerOneScore = 0;
+	int32 PlayerTwoScore = 0;
+	int32 CurrentRound = 1;
 	
 	UPROPERTY()
 	TObjectPtr<UPlayerHUD> PlayerHUD; 
 	
 	UPROPERTY()
 	TObjectPtr<UPlayerHUD> PlayerHUDTwo;
+	
+	UPROPERTY()
+	TObjectPtr<ACosmicBlastArenaCharacter> CharacterOne;
+	
+	UPROPERTY()
+	TObjectPtr<ACosmicBlastArenaCharacter> CharacterTwo;
+	
+	UPROPERTY()
+	TObjectPtr<APlayerController> PlayerOneController;
+	
+	UPROPERTY()
+	TObjectPtr<APlayerController> PlayerTwoController;
+	
+	UPROPERTY(EditInstanceOnly, Category="Respawn")
+	TObjectPtr<APlayerStart> PlayerStartOne;
+
+	UPROPERTY(EditInstanceOnly, Category="Respawn")
+	TObjectPtr<APlayerStart> PlayerStartTwo;
+	
+	UPROPERTY(VisibleAnywhere)
+	bool bRoundStarted = false;
+	
+	UPROPERTY(VisibleAnywhere)
+	bool bRoundFinished = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Timer")
+	float RoundTimeRemaining;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Timer")
+	float RoundDuration = 181.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player Materials")
 	TObjectPtr<UMaterialInterface> PlayerOneMaterial;
@@ -54,6 +85,18 @@ public:
 	
 	UFUNCTION()
 	void StartRound();
+	
+	UFUNCTION()
+	void StartNextRound();
+	
+	UFUNCTION()
+	void RespawnPlayers();
+	
+	UFUNCTION()
+	void EndRound();
+	
+	UFUNCTION()
+	void HandlePlayerDeath();
 	
 	UFUNCTION()
 	void ShowRoundIntro();

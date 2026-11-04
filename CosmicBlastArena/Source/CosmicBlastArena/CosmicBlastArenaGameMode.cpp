@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CosmicBlastArenaGameMode.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -21,8 +22,8 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 	
 	UGameplayStatics::CreatePlayer(this, 1, true);
 	
-	APlayerController* PlayerOneController = UGameplayStatics::GetPlayerController(this, 0);
-	APlayerController* PlayerTwoController = UGameplayStatics::GetPlayerController(this, 1);
+	PlayerOneController = UGameplayStatics::GetPlayerController(this, 0);
+	PlayerTwoController = UGameplayStatics::GetPlayerController(this, 1);
 	
 	ACharacter* PlayerOneCharacter = Cast<ACharacter>(PlayerOneController->GetPawn());
 	ACharacter* PlayerTwoCharacter = Cast<ACharacter>(PlayerTwoController->GetPawn());
@@ -37,12 +38,12 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 		PlayerTwoCharacter->GetMesh()->SetMaterial(1, PlayerTwoMaterial);
 	}
 	
-	RoundTimeRemaining = 181.0f;
+	RoundTimeRemaining = RoundDuration;
 	
 	if (!IsValid(PlayerOneCharacter) || !IsValid(PlayerTwoCharacter)) return;
 	
-	ACosmicBlastArenaCharacter* CharacterOne = Cast<ACosmicBlastArenaCharacter>(PlayerOneController->GetPawn());
-	ACosmicBlastArenaCharacter* CharacterTwo = Cast<ACosmicBlastArenaCharacter>(PlayerTwoController->GetPawn());
+	CharacterOne = Cast<ACosmicBlastArenaCharacter>(PlayerOneController->GetPawn());
+	CharacterTwo = Cast<ACosmicBlastArenaCharacter>(PlayerTwoController->GetPawn());
 	
 	if (!IsValid(CharacterOne) || !IsValid(CharacterTwo)) return;
 	
@@ -58,12 +59,24 @@ void ACosmicBlastArenaGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (bRoundStarted == true && RoundTimeRemaining >= 0.0f)
+	if (bRoundStarted == true && RoundTimeRemaining > 0.0f)
+	{
 		RoundTimeRemaining -=  DeltaTime;
+		
+		if (RoundTimeRemaining <= 0.0f)
+		{
+			EndRound();
+		}
+	}
 }
 
 void ACosmicBlastArenaGameMode::StartRound()
 {
+	bRoundStarted = true;
+	bRoundFinished = false;
+	
+	RoundTimeRemaining = RoundDuration;
+	
 	PlayerHUD->HideRoundAnnouncementUI();
 	PlayerHUDTwo->HideRoundAnnouncementUI();
 	
@@ -73,11 +86,81 @@ void ACosmicBlastArenaGameMode::StartRound()
 	bRoundStarted = true;
 }
 
+void ACosmicBlastArenaGameMode::EndRound()
+{
+	bRoundStarted = false;
+	bRoundFinished = true;
+	
+	RoundTimeRemaining = RoundDuration;
+	
+	if (CharacterOne->CurrentHealth < CharacterTwo->CurrentHealth)
+	{
+		PlayerTwoScore++;
+	}
+	else if (CharacterOne->CurrentHealth > CharacterTwo->CurrentHealth)
+	{
+		PlayerOneScore++;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Draw!"));
+	}
+	
+	PlayerHUD->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+	PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+	GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, &ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
+}
+
+void ACosmicBlastArenaGameMode::HandlePlayerDeath()
+{
+	if (bRoundStarted == true && RoundTimeRemaining > 0.0f)
+	{
+		if (CharacterOne->CurrentHealth <= 0.0f)
+		{
+			PlayerOneScore++;
+			PlayerHUD->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+			PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+			bRoundFinished = true;
+		}
+		else if (CharacterTwo->CurrentHealth <= 0.0f)
+		{
+			PlayerTwoScore++;
+			PlayerHUD->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+			PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+			bRoundFinished = true;
+		}
+		
+		if (bRoundFinished == true)
+		{
+			GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, &ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
+		}
+	}
+}
+
+void ACosmicBlastArenaGameMode::StartNextRound()
+{
+	RespawnPlayers();
+	CurrentRound++;
+	
+	PlayerHUD->UpdateNextRoundUI(CurrentRound);
+	PlayerHUDTwo->UpdateNextRoundUI(CurrentRound);
+	
+	PlayerHUD->HideGameplayHUD();
+	PlayerHUDTwo->HideGameplayHUD();
+	
+	ShowRoundIntro();
+}
+
+void ACosmicBlastArenaGameMode::RespawnPlayers()
+{
+	RestartPlayerAtPlayerStart(PlayerOneController, PlayerStartOne);
+	RestartPlayerAtPlayerStart(PlayerTwoController, PlayerStartTwo);
+}
+
 void ACosmicBlastArenaGameMode::ShowRoundIntro()
 {
 	PlayerHUD->ShowRoundAnnouncementUI();
 	PlayerHUDTwo->ShowRoundAnnouncementUI();
-
 	GetWorldTimerManager().SetTimer(RoundIntroHandle, this, &ACosmicBlastArenaGameMode::StartRound, 3.0f, false);
 }
 

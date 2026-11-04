@@ -48,6 +48,12 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> GrenadeTextBlock;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> PlayerOneScoreTextBlock;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> PlayerTwoScoreTextBlock;
+	
 	UPROPERTY()
 	TObjectPtr<ACosmicBlastArenaCharacter> PlayerCharacter;
 	
@@ -65,6 +71,12 @@ public:
 	
 	UFUNCTION()
 	void UpdateTimerUI();
+	
+	UFUNCTION()
+	void UpdateScoreUI(int32 PlayerOneScore, int32 PlayerTwoScore);
+	
+	UFUNCTION()
+	void UpdateNextRoundUI(int32 CurrentRound);
 	
 	UFUNCTION()
 	void ShowReloadingUI();

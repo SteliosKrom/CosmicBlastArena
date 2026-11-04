@@ -70,6 +70,19 @@ void UPlayerHUD::UpdateGrenadesUI(int32 CurrentGrenade)
 	GrenadeTextBlock->SetText(FText::AsNumber(PlayerCharacter->CurrentGrenade));
 }
 
+void UPlayerHUD::UpdateScoreUI(int32 PlayerOneScore, int32 PlayerTwoScore)
+{
+	if (!IsValid(PlayerOneScoreTextBlock) || !IsValid(PlayerTwoScoreTextBlock)) return;
+	PlayerOneScoreTextBlock->SetText(FText::AsNumber(PlayerOneScore));
+	PlayerTwoScoreTextBlock->SetText(FText::AsNumber(PlayerTwoScore));
+}
+
+void UPlayerHUD::UpdateNextRoundUI(int32 CurrentRound)
+{
+	if (!IsValid(RoundIntroTextBlock)) return;
+	RoundIntroTextBlock->SetText(FText::FromString(FString::Printf(TEXT("ROUND %d"), CurrentRound)));
+}
+
 void UPlayerHUD::ShowReloadingUI() 
 {
 	if (!IsValid(ReloadingTextBlock)) return;
