@@ -183,6 +183,7 @@ void ACosmicBlastArenaCharacter::Die()
 	if (!IsValid(AnimInstance))
 		return;
 	
+	AnimInstance->SetUsefulBody(true);
 	AnimInstance->Montage_Play(DeathMontage);
 	Dying();
 	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));

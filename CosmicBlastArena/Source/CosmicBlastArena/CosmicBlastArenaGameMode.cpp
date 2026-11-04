@@ -88,6 +88,9 @@ void ACosmicBlastArenaGameMode::StartRound()
 
 void ACosmicBlastArenaGameMode::EndRound()
 {
+	CharacterOne->CurrentHealth = CharacterOne->MaxHealth;
+	CharacterTwo->CurrentHealth = CharacterTwo->MaxHealth;
+
 	bRoundStarted = false;
 	bRoundFinished = true;
 	
