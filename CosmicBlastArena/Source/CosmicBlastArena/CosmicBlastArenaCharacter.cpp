@@ -183,7 +183,7 @@ void ACosmicBlastArenaCharacter::Die()
 	if (!IsValid(AnimInstance))
 		return;
 	
-	AnimInstance->SetUsefulBody(true);
+	//AnimInstance->SetUsefulBody(true);
 	AnimInstance->Montage_Play(DeathMontage);
 	Dying();
 	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
@@ -212,7 +212,7 @@ void ACosmicBlastArenaCharacter::Move(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	
-	bIsMoving = !MovementVector.IsNearlyZero();
+	bIsMoving = !MovementVector.IsNearlyZero(); 
 	
 	// route the input
 	DoMove(MovementVector.X, MovementVector.Y);

@@ -90,16 +90,22 @@ public:
 	void StartNextRound();
 	
 	UFUNCTION()
-	void RespawnPlayers();
+	void EndRound();
 	
 	UFUNCTION()
-	void EndRound();
+	void EndGame();
 	
 	UFUNCTION()
 	void HandlePlayerDeath();
 	
 	UFUNCTION()
 	void ShowRoundIntro();
+	
+	UFUNCTION()
+	void ResetResources();
+	
+	UFUNCTION()
+	void ResetScore();
 };
 
 

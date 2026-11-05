@@ -88,9 +88,8 @@ void ACosmicBlastArenaGameMode::StartRound()
 
 void ACosmicBlastArenaGameMode::EndRound()
 {
-	CharacterOne->CurrentHealth = CharacterOne->MaxHealth;
-	CharacterTwo->CurrentHealth = CharacterTwo->MaxHealth;
-
+	ResetResources();
+	
 	bRoundStarted = false;
 	bRoundFinished = true;
 	
@@ -140,9 +139,65 @@ void ACosmicBlastArenaGameMode::HandlePlayerDeath()
 	}
 }
 
+void ACosmicBlastArenaGameMode::EndGame()
+{
+	ResetResources();
+	
+	PlayerHUD->HideGameplayHUD();
+	PlayerHUDTwo->HideGameplayHUD();
+	
+	if (PlayerOneScore == 2)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player 1 wins!"));
+		// Display P1 Wins from PlayerHUD
+	}
+	
+	if (PlayerTwoScore == 2)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player 2 wins!"));
+		// Display P2 wins from PlayerHUDTwo
+	}
+}
+
+void ACosmicBlastArenaGameMode::ResetScore()
+{
+	PlayerOneScore = 0;
+	PlayerTwoScore = 0;
+	
+	PlayerHUD->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+	PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+}
+
+void ACosmicBlastArenaGameMode::ResetResources() 
+{
+	// Health
+	CharacterOne->CurrentHealth = CharacterOne->MaxHealth;
+	CharacterTwo->CurrentHealth = CharacterTwo->MaxHealth;
+	
+	PlayerHUD->UpdateHealthUI(CharacterOne->CurrentHealth, CharacterOne->MaxHealth);
+	PlayerHUDTwo->UpdateHealthUI(CharacterTwo->CurrentHealth, CharacterTwo->MaxHealth);
+	
+	// Ammo
+	CharacterOne->CurrentAmmo = CharacterOne->MagazineCapacity;
+	CharacterTwo->CurrentAmmo = CharacterTwo->MagazineCapacity;
+	
+	CharacterOne->ReserveAmmo = CharacterOne->MaxReserveAmmo;
+	CharacterTwo->ReserveAmmo = CharacterTwo->MaxReserveAmmo;
+	
+	PlayerHUD->UpdateFullAmmoUI(CharacterOne->CurrentAmmo, CharacterOne->ReserveAmmo);
+	PlayerHUDTwo->UpdateFullAmmoUI(CharacterTwo->CurrentAmmo, CharacterTwo->ReserveAmmo);
+	
+	// Grenades
+	CharacterOne->CurrentGrenade = CharacterOne->MaxGrenades;
+	CharacterTwo->CurrentGrenade = CharacterTwo->MaxGrenades;
+	
+	PlayerHUD->UpdateGrenadesUI(CharacterOne->CurrentGrenade);
+	PlayerHUDTwo->UpdateGrenadesUI(CharacterTwo->CurrentGrenade);
+}
+
 void ACosmicBlastArenaGameMode::StartNextRound()
 {
-	RespawnPlayers();
+	ResetResources();
 	CurrentRound++;
 	
 	PlayerHUD->UpdateNextRoundUI(CurrentRound);
@@ -152,12 +207,6 @@ void ACosmicBlastArenaGameMode::StartNextRound()
 	PlayerHUDTwo->HideGameplayHUD();
 	
 	ShowRoundIntro();
-}
-
-void ACosmicBlastArenaGameMode::RespawnPlayers()
-{
-	RestartPlayerAtPlayerStart(PlayerOneController, PlayerStartOne);
-	RestartPlayerAtPlayerStart(PlayerTwoController, PlayerStartTwo);
 }
 
 void ACosmicBlastArenaGameMode::ShowRoundIntro()

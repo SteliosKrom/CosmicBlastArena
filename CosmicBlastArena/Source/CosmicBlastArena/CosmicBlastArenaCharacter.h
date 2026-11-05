@@ -194,6 +194,9 @@ public:
 	int32 ReserveAmmo = 120;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	int32 MaxReserveAmmo = 120;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 SpendAmmoCount = 0;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
