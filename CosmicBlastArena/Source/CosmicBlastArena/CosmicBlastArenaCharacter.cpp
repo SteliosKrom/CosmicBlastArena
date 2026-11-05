@@ -18,6 +18,7 @@
 #include "Animation/AnimMontage.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerHUD.h"
+#include "ArenaAnimInstance.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -183,7 +184,13 @@ void ACosmicBlastArenaCharacter::Die()
 	if (!IsValid(AnimInstance))
 		return;
 	
-	//AnimInstance->SetUsefulBody(true);
+	
+	if (auto* arena = dynamic_cast<UArenaAnimInstance*>(AnimInstance))
+	{
+		arena->SetUsefulBody(true);
+		UE_LOG(LogTemp, Warning, TEXT("Animation flip success!"));
+	}
+	
 	AnimInstance->Montage_Play(DeathMontage);
 	Dying();
 	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
