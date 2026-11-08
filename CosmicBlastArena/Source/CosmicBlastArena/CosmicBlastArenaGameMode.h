@@ -96,13 +96,13 @@ public:
 	void EndGame();
 	
 	UFUNCTION()
+	void RestartLevel();
+	
+	UFUNCTION()
 	void HandlePlayerDeath();
 	
 	UFUNCTION()
 	void ShowRoundIntro();
-	
-	UFUNCTION()
-	void ResetResources();
 	
 	UFUNCTION()
 	void ResetScore();

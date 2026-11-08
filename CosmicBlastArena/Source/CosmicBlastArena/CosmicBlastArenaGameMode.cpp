@@ -1,13 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CosmicBlastArenaGameMode.h"
-#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "TimerManager.h"
 #include "CosmicBlastArenaCharacter.h"
 #include "GameFramework/Character.h"
+#include "CosmicBlastArenaGameInstance.h"
 
 ACosmicBlastArenaGameMode::ACosmicBlastArenaGameMode()
 {
@@ -17,6 +17,14 @@ ACosmicBlastArenaGameMode::ACosmicBlastArenaGameMode()
 void ACosmicBlastArenaGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	UCosmicBlastArenaGameInstance* MyGameInstance = Cast<UCosmicBlastArenaGameInstance>(GetGameInstance());
+	
+	if (!IsValid(MyGameInstance)) return;
+	
+	PlayerOneScore = MyGameInstance->PlayerOneScore;
+	PlayerTwoScore = MyGameInstance->PlayerTwoScore;
+	CurrentRound = MyGameInstance->CurrentRound;
 	
 	bRoundStarted = false;
 	
@@ -52,7 +60,13 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 	
 	if (!IsValid(PlayerHUD) || !IsValid(PlayerHUDTwo)) return;
 	
-	GetWorldTimerManager().SetTimer(InitialDelayHandle, this, &ACosmicBlastArenaGameMode::ShowRoundIntro, 3.0f, false);
+	PlayerHUD->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+	PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+
+	PlayerHUD->UpdateNextRoundUI(CurrentRound);
+	PlayerHUDTwo->UpdateNextRoundUI(CurrentRound);
+	
+	ShowRoundIntro();
 }
 
 void ACosmicBlastArenaGameMode::Tick(float DeltaTime)
@@ -88,8 +102,6 @@ void ACosmicBlastArenaGameMode::StartRound()
 
 void ACosmicBlastArenaGameMode::EndRound()
 {
-	ResetResources();
-	
 	bRoundStarted = false;
 	bRoundFinished = true;
 	
@@ -108,15 +120,41 @@ void ACosmicBlastArenaGameMode::EndRound()
 		UE_LOG(LogTemp, Warning, TEXT("Draw!"));
 	}
 	
+	if (PlayerOneScore >= 2 || PlayerTwoScore >= 2)
+	{
+		EndGame();
+		return;
+	}
+	
 	PlayerHUD->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
 	PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
+	
 	GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, &ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
+}
+
+void ACosmicBlastArenaGameMode::RestartLevel()
+{
+	UCosmicBlastArenaGameInstance* MyGameInstance = Cast<UCosmicBlastArenaGameInstance>(GetGameInstance());
+	
+	if (!IsValid(MyGameInstance)) return;
+	
+	MyGameInstance->PlayerOneScore = PlayerOneScore;
+	MyGameInstance->PlayerTwoScore = PlayerTwoScore;
+	MyGameInstance->CurrentRound = CurrentRound;
+	
+	UGameplayStatics::OpenLevel(this, *UGameplayStatics::GetCurrentLevelName(this, true));
 }
 
 void ACosmicBlastArenaGameMode::HandlePlayerDeath()
 {
 	if (bRoundStarted == true && RoundTimeRemaining > 0.0f)
 	{
+		if (PlayerOneScore >= 2 || PlayerTwoScore >= 2)
+		{
+			EndGame();
+			return;
+		}
+		
 		if (CharacterOne->CurrentHealth <= 0.0f)
 		{
 			PlayerOneScore++;
@@ -141,22 +179,25 @@ void ACosmicBlastArenaGameMode::HandlePlayerDeath()
 
 void ACosmicBlastArenaGameMode::EndGame()
 {
-	ResetResources();
-	
 	PlayerHUD->HideGameplayHUD();
 	PlayerHUDTwo->HideGameplayHUD();
 	
 	if (PlayerOneScore == 2)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player 1 wins!"));
-		// Display P1 Wins from PlayerHUD
 	}
 	
 	if (PlayerTwoScore == 2)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player 2 wins!"));
-		// Display P2 wins from PlayerHUDTwo
 	}
+	
+	if (IsValid(PlayerTwoController))
+	{
+		UGameplayStatics::RemovePlayer(PlayerTwoController, true);
+	}
+	
+	UGameplayStatics::OpenLevel(this, FName("MainMenu"));
 }
 
 void ACosmicBlastArenaGameMode::ResetScore()
@@ -168,45 +209,11 @@ void ACosmicBlastArenaGameMode::ResetScore()
 	PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
 }
 
-void ACosmicBlastArenaGameMode::ResetResources() 
-{
-	// Health
-	CharacterOne->CurrentHealth = CharacterOne->MaxHealth;
-	CharacterTwo->CurrentHealth = CharacterTwo->MaxHealth;
-	
-	PlayerHUD->UpdateHealthUI(CharacterOne->CurrentHealth, CharacterOne->MaxHealth);
-	PlayerHUDTwo->UpdateHealthUI(CharacterTwo->CurrentHealth, CharacterTwo->MaxHealth);
-	
-	// Ammo
-	CharacterOne->CurrentAmmo = CharacterOne->MagazineCapacity;
-	CharacterTwo->CurrentAmmo = CharacterTwo->MagazineCapacity;
-	
-	CharacterOne->ReserveAmmo = CharacterOne->MaxReserveAmmo;
-	CharacterTwo->ReserveAmmo = CharacterTwo->MaxReserveAmmo;
-	
-	PlayerHUD->UpdateFullAmmoUI(CharacterOne->CurrentAmmo, CharacterOne->ReserveAmmo);
-	PlayerHUDTwo->UpdateFullAmmoUI(CharacterTwo->CurrentAmmo, CharacterTwo->ReserveAmmo);
-	
-	// Grenades
-	CharacterOne->CurrentGrenade = CharacterOne->MaxGrenades;
-	CharacterTwo->CurrentGrenade = CharacterTwo->MaxGrenades;
-	
-	PlayerHUD->UpdateGrenadesUI(CharacterOne->CurrentGrenade);
-	PlayerHUDTwo->UpdateGrenadesUI(CharacterTwo->CurrentGrenade);
-}
-
 void ACosmicBlastArenaGameMode::StartNextRound()
 {
-	ResetResources();
+	UE_LOG(LogTemp, Warning, TEXT("StartNextRound called!"));
 	CurrentRound++;
-	
-	PlayerHUD->UpdateNextRoundUI(CurrentRound);
-	PlayerHUDTwo->UpdateNextRoundUI(CurrentRound);
-	
-	PlayerHUD->HideGameplayHUD();
-	PlayerHUDTwo->HideGameplayHUD();
-	
-	ShowRoundIntro();
+	RestartLevel();
 }
 
 void ACosmicBlastArenaGameMode::ShowRoundIntro()
