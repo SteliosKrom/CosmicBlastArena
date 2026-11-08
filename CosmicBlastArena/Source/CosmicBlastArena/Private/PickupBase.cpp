@@ -54,7 +54,9 @@ void APickupBase::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Pickup overlapped by: %s"), *OtherActor->GetName());
-			ArenaCharacter->CurrentHealth += ArenaCharacter->HealthBoost;
+			ArenaCharacter->CurrentHealth = FMath::Min(ArenaCharacter->CurrentHealth + ArenaCharacter->HealthBoost, ArenaCharacter->MaxHealth);
+			ArenaCharacter->OnHealthChanged.Broadcast(ArenaCharacter->CurrentHealth, ArenaCharacter->MaxHealth);
+			Destroy();
 		}
 	}
 }
