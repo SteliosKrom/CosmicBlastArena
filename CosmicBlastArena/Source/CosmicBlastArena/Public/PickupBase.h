@@ -8,6 +8,7 @@
 
 class UStaticMeshComponent;
 class USphereComponent;
+class UMaterial;
 
 UCLASS()
 class COSMICBLASTARENA_API APickupBase : public AActor
@@ -32,6 +33,9 @@ protected:
 	void OnPickupOverlap(UPrimitiveComponent* overlappedComponent, 
 		AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
 		bool bFromSweep, const FHitResult& SweepResult); 
+	
+	UFUNCTION()
+	virtual void ApplyPickupEffect(ACosmicBlastArenaCharacter* Character);
 
 public:	
 	// Called every frame
