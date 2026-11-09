@@ -193,7 +193,6 @@ void ACosmicBlastArenaCharacter::Die()
 	
 	AnimInstance->Montage_Play(DeathMontage);
 	Dying();
-	UE_LOG(LogTemp, Warning, TEXT("%s actor is dead!"), *GetNameSafe(this));
 	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();
 	GameMode->HandlePlayerDeath();
@@ -266,9 +265,6 @@ void ACosmicBlastArenaCharacter::Shoot()
 	
 	OnShoot.Broadcast(CurrentAmmo, ReserveAmmo);
 	
-	UE_LOG(LogTemp, Display, TEXT("Current ammo: %d\n"), CurrentAmmo);
-	UE_LOG(LogTemp, Display, TEXT("Spend ammo: %d\n"), SpendAmmoCount);
-	
 	const FVector Start = FollowCamera->GetComponentLocation();
 	const FVector Direction = FollowCamera->GetForwardVector();
 	const FVector End = Start + Direction * 5000.0f;
@@ -291,20 +287,13 @@ void ACosmicBlastArenaCharacter::Shoot()
 				return;
 				
 			if (HitResult.BoneName == "head")
-			{
-				UE_LOG(LogTemp, Warning, TEXT("That was a headshot!"));
 				Damage = 50;
-				UE_LOG(LogTemp, Display, TEXT("Head shot damage: %d"), Damage);
-			}
 			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("That was a body shot!"));
 				Damage = FMath::RandRange(7, 13);
-				UE_LOG(LogTemp, Display, TEXT("Body shot damage: %d"), Damage);
-			}
 			
-			IDamageable::Execute_ReceiveDamage(HitActor, Damage);
-			UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *GetNameSafe(HitActor));
+			const float FinalDamage = Damage * DamageMultiplier;
+			
+			IDamageable::Execute_ReceiveDamage(HitActor, FinalDamage);
 			DrawDebugPoint(GetWorld(), TraceEnd, 50.0f, FColor::Red, false, 2.0f);
 		}
 		else
@@ -312,6 +301,17 @@ void ACosmicBlastArenaCharacter::Shoot()
 			UE_LOG(LogTemp, Warning, TEXT("No hit!"))
 		}
 	}
+}
+
+void ACosmicBlastArenaCharacter::ActivateDoubleDamage()
+{
+	DamageMultiplier = 2.0f;
+	GetWorldTimerManager().SetTimer(DamageMultiplierTimerHandle, this, &ACosmicBlastArenaCharacter::ResetDoubleDamage, 10.0f, false);
+}
+
+void ACosmicBlastArenaCharacter::ResetDoubleDamage()
+{
+	DamageMultiplier = 1.0f;
 }
 
 void ACosmicBlastArenaCharacter::FinishReload()
@@ -322,7 +322,6 @@ void ACosmicBlastArenaCharacter::FinishReload()
 	bIsReloading = false;
 	OnReloading.Broadcast(CurrentAmmo, ReserveAmmo);
 	HUD->HideReloadingUI();
-	UE_LOG(LogTemp, Warning, TEXT("ReserveAmmo: %d\n"), ReserveAmmo);
 }
 
 void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)

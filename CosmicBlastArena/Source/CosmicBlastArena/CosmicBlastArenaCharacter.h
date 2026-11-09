@@ -132,7 +132,10 @@ protected:
 	
 	float CurrentFOV;
 	float Timer = 0.0f;
+	float DamageMultiplier = 1.0f;
+	
 	FTimerHandle ShootingTimerHandle;
+	FTimerHandle DamageMultiplierTimerHandle;
 	
 public:
 
@@ -150,6 +153,10 @@ public:
 	void OnThrowHold();
 	
 	void OnThrowFinished();
+	
+	void ActivateDoubleDamage();
+	
+	void ResetDoubleDamage();
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
@@ -179,7 +186,7 @@ public:
 	bool bIsDead = false;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
-	int Damage = 0;
+	int32 Damage = 0;
 	
 	UPROPERTY(BlueprintAssignable, Category="Ammo")
 	FOnShoot OnShoot;
