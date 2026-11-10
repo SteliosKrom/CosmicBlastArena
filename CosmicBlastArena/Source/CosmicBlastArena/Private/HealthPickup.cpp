@@ -14,7 +14,7 @@ void AHealthPickup::ApplyPickupEffect(ACosmicBlastArenaCharacter* ArenaCharacter
 	{
 		if (ArenaCharacter->CurrentHealth >= ArenaCharacter->MaxHealth)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("You have full health %.2f. You cannot heal!"), ArenaCharacter->CurrentHealth);
+			UE_LOG(LogTemp, Warning, TEXT("You have full health %.2d."), ArenaCharacter->CurrentHealth);
 			return;
 		}
 		ArenaCharacter->CurrentHealth = FMath::Min(ArenaCharacter->CurrentHealth + ArenaCharacter->HealthBoost, ArenaCharacter->MaxHealth);

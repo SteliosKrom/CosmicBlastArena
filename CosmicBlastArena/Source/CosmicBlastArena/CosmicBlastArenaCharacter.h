@@ -24,6 +24,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, CurrentHea
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReloading, float, CurrentAmmo, float, ReserveAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShoot, float, CurrentAmmo, float, ReserveAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDoubleDamageChanged, int32, SecondsRemaining, bool, IsActive);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReserveAmmoChanged, int32, NewReserveAmmo);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -184,11 +185,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Ammo")
 	FOnShoot OnShoot;
 	
+	UPROPERTY(BlueprintAssignable, Category="Ammo")
+	FOnReserveAmmoChanged OnReserveAmmoChanged;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
-	float MaxHealth = 200.0f;
+	int32 MaxHealth = 200;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
-	float CurrentHealth = MaxHealth;
+	int32 CurrentHealth = MaxHealth;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float HealthBoost = 50.0f;
@@ -198,8 +202,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	int32 Damage = 0;
-	
-
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 MagazineCapacity = 30;
@@ -215,6 +217,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 SpendAmmoCount = 0;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
+	int32 AmmoBoost = 20;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	bool bIsReloading = false;

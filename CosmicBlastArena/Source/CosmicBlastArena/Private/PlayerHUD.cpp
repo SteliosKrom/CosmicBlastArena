@@ -16,6 +16,7 @@ void UPlayerHUD::NativeConstruct()
 	PlayerCharacter->OnReloading.AddDynamic(this, &UPlayerHUD::UpdateFullAmmoUI);
 	PlayerCharacter->OnShoot.AddDynamic(this, &UPlayerHUD::UpdateCurrentAmmoUI);
 	PlayerCharacter->OnDoubleDamageChanged.AddDynamic(this, &UPlayerHUD::UpdateDoubleDamageUI);
+	PlayerCharacter->OnReserveAmmoChanged.AddDynamic(this, &UPlayerHUD::UpdateReserveAmmoUI);
 	
 	UpdateHealthUI(PlayerCharacter->CurrentHealth, PlayerCharacter->MaxHealth);
 	UpdateFullAmmoUI(PlayerCharacter->CurrentAmmo, PlayerCharacter->ReserveAmmo);
@@ -97,6 +98,13 @@ void UPlayerHUD::UpdateDoubleDamageUI(int32 SecondsRemaining, bool IsActive)
 	{
 		DoubleDamageTextBlock->SetVisibility(ESlateVisibility::Collapsed);
 	}
+}
+
+void UPlayerHUD::UpdateReserveAmmoUI(int32 NewReserveAmmo)
+{
+	if (!IsValid(AmmoTextBlock)) return;
+	
+	AmmoTextBlock->SetText(FText::Format(FText::FromString(TEXT("{0} / {1}")), FText::AsNumber(PlayerCharacter->CurrentAmmo), FText::AsNumber(NewReserveAmmo)));
 }
 
 void UPlayerHUD::ShowReloadingUI() 
