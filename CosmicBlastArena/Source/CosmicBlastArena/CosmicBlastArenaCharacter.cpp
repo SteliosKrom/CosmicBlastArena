@@ -184,7 +184,6 @@ void ACosmicBlastArenaCharacter::Die()
 	if (!IsValid(AnimInstance))
 		return;
 	
-	
 	if (auto* arena = dynamic_cast<UArenaAnimInstance*>(AnimInstance))
 	{
 		arena->SetUsefulBody(true);
@@ -303,15 +302,34 @@ void ACosmicBlastArenaCharacter::Shoot()
 	}
 }
 
+void ACosmicBlastArenaCharacter::UpdateDoubleDamageCountdown()
+{
+	DoubleDamageSecondsRemaining--;
+	
+	UE_LOG(LogTemp, Warning, TEXT("Double Damage: %d"), DoubleDamageSecondsRemaining);
+	OnDoubleDamageChanged.Broadcast(DoubleDamageSecondsRemaining, true);
+	
+	if (DoubleDamageSecondsRemaining <= 0)
+	{
+		ResetDoubleDamage();
+		GetWorldTimerManager().ClearTimer(DamageMultiplierTimerHandle);
+	}
+}
+
 void ACosmicBlastArenaCharacter::ActivateDoubleDamage()
 {
 	DamageMultiplier = 2.0f;
-	GetWorldTimerManager().SetTimer(DamageMultiplierTimerHandle, this, &ACosmicBlastArenaCharacter::ResetDoubleDamage, 10.0f, false);
+	DoubleDamageSecondsRemaining = 10;
+	
+	OnDoubleDamageChanged.Broadcast(DoubleDamageSecondsRemaining, true);
+	
+	GetWorldTimerManager().SetTimer(DamageMultiplierTimerHandle, this, &ACosmicBlastArenaCharacter::UpdateDoubleDamageCountdown, 1.0f, true);
 }
 
 void ACosmicBlastArenaCharacter::ResetDoubleDamage()
 {
 	DamageMultiplier = 1.0f;
+	OnDoubleDamageChanged.Broadcast(0, false);
 }
 
 void ACosmicBlastArenaCharacter::FinishReload()
