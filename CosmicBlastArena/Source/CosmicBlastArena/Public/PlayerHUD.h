@@ -85,6 +85,9 @@ public:
 	void UpdateDoubleDamageUI(int32 SecondsRemaining, bool IsActive);
 	
 	UFUNCTION()
+	void UpdateReserveAmmoUI(int32 NewReserveAmmo);
+	
+	UFUNCTION()
 	void ShowReloadingUI();
 	
 	UFUNCTION()
