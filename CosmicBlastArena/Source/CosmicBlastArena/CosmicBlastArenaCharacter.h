@@ -23,6 +23,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, CurrentHealth, float, MaxHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReloading, float, CurrentAmmo, float, ReserveAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShoot, float, CurrentAmmo, float, ReserveAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDoubleDamageChanged, int32, SecondsRemaining, bool, IsActive);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -134,6 +135,8 @@ protected:
 	float Timer = 0.0f;
 	float DamageMultiplier = 1.0f;
 	
+	int32 DoubleDamageSecondsRemaining;
+	
 	FTimerHandle ShootingTimerHandle;
 	FTimerHandle DamageMultiplierTimerHandle;
 	
@@ -158,6 +161,8 @@ public:
 	
 	void ResetDoubleDamage();
 	
+	void UpdateDoubleDamageCountdown();
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
@@ -172,6 +177,12 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChanged OnHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="PowerUps")
+	FOnDoubleDamageChanged OnDoubleDamageChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="Ammo")
+	FOnShoot OnShoot;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float MaxHealth = 200.0f;
@@ -188,8 +199,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	int32 Damage = 0;
 	
-	UPROPERTY(BlueprintAssignable, Category="Ammo")
-	FOnShoot OnShoot;
+
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ammo")
 	int32 MagazineCapacity = 30;

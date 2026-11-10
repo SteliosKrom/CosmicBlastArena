@@ -15,6 +15,7 @@ void UPlayerHUD::NativeConstruct()
 	PlayerCharacter->OnHealthChanged.AddDynamic(this, &UPlayerHUD::UpdateHealthUI);
 	PlayerCharacter->OnReloading.AddDynamic(this, &UPlayerHUD::UpdateFullAmmoUI);
 	PlayerCharacter->OnShoot.AddDynamic(this, &UPlayerHUD::UpdateCurrentAmmoUI);
+	PlayerCharacter->OnDoubleDamageChanged.AddDynamic(this, &UPlayerHUD::UpdateDoubleDamageUI);
 	
 	UpdateHealthUI(PlayerCharacter->CurrentHealth, PlayerCharacter->MaxHealth);
 	UpdateFullAmmoUI(PlayerCharacter->CurrentAmmo, PlayerCharacter->ReserveAmmo);
@@ -23,7 +24,7 @@ void UPlayerHUD::NativeConstruct()
 
 void UPlayerHUD::UpdateHealthUI(float CurrentHealth, float MaxHealth)
 {
-	if (!IsValid(HealthProgressBar) || MaxHealth <= 0.0f) return;
+	if (!IsValid(HealthProgressBar) || !IsValid(HealthTextBlock) || MaxHealth <= 0.0f) return;
 	
 	const float HealthPercent = CurrentHealth / MaxHealth;
 	HealthProgressBar->SetPercent(HealthPercent);
@@ -81,6 +82,21 @@ void UPlayerHUD::UpdateNextRoundUI(int32 CurrentRound)
 {
 	if (!IsValid(RoundIntroTextBlock)) return;
 	RoundIntroTextBlock->SetText(FText::FromString(FString::Printf(TEXT("ROUND %d"), CurrentRound)));
+}
+
+void UPlayerHUD::UpdateDoubleDamageUI(int32 SecondsRemaining, bool IsActive)
+{
+	if (!IsValid(DoubleDamageTextBlock)) return;
+	
+	if (IsActive)
+	{
+		DoubleDamageTextBlock->SetVisibility(ESlateVisibility::Visible);
+		DoubleDamageTextBlock->SetText(FText::Format(FText::FromString(TEXT("DOUBLE DAMAGE: {0}s")), FText::AsNumber(SecondsRemaining)));
+	}
+	else
+	{
+		DoubleDamageTextBlock->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UPlayerHUD::ShowReloadingUI() 

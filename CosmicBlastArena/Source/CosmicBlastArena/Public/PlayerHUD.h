@@ -49,6 +49,9 @@ public:
 	TObjectPtr<UTextBlock> GrenadeTextBlock;
 	
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> DoubleDamageTextBlock;
+	
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> PlayerOneScoreTextBlock;
 	
 	UPROPERTY(meta=(BindWidget))
@@ -77,6 +80,9 @@ public:
 	
 	UFUNCTION()
 	void UpdateNextRoundUI(int32 CurrentRound);
+	
+	UFUNCTION()
+	void UpdateDoubleDamageUI(int32 SecondsRemaining, bool IsActive);
 	
 	UFUNCTION()
 	void ShowReloadingUI();
