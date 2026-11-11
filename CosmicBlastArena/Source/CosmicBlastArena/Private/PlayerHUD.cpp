@@ -3,6 +3,7 @@
 #include "PlayerHUD.h"
 #include "CosmicBlastArenaCharacter.h"
 #include "CosmicBlastArenaGameMode.h"
+#include "Animation/WidgetAnimation.h"
 
 void UPlayerHUD::NativeConstruct()
 {
@@ -17,6 +18,7 @@ void UPlayerHUD::NativeConstruct()
 	PlayerCharacter->OnShoot.AddDynamic(this, &UPlayerHUD::UpdateCurrentAmmoUI);
 	PlayerCharacter->OnDoubleDamageChanged.AddDynamic(this, &UPlayerHUD::UpdateDoubleDamageUI);
 	PlayerCharacter->OnReserveAmmoChanged.AddDynamic(this, &UPlayerHUD::UpdateReserveAmmoUI);
+	PlayerCharacter->OnDamageTaken.AddDynamic(this, &UPlayerHUD::ShowDamageOverlay);
 	
 	UpdateHealthUI(PlayerCharacter->CurrentHealth, PlayerCharacter->MaxHealth);
 	UpdateFullAmmoUI(PlayerCharacter->CurrentAmmo, PlayerCharacter->ReserveAmmo);
@@ -105,6 +107,15 @@ void UPlayerHUD::UpdateReserveAmmoUI(int32 NewReserveAmmo)
 	if (!IsValid(AmmoTextBlock)) return;
 	
 	AmmoTextBlock->SetText(FText::Format(FText::FromString(TEXT("{0} / {1}")), FText::AsNumber(PlayerCharacter->CurrentAmmo), FText::AsNumber(NewReserveAmmo)));
+}
+
+void UPlayerHUD::ShowDamageOverlay()
+{
+	if (!IsValid(DamageEffect)) return;
+	if (!IsValid(DamageAnimation)) return;
+	
+	DamageEffect->SetVisibility(ESlateVisibility::Visible);
+	PlayAnimation(DamageAnimation);
 }
 
 void UPlayerHUD::ShowReloadingUI() 

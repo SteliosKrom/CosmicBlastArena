@@ -167,6 +167,7 @@ void ACosmicBlastArenaCharacter::ReceiveDamage_Implementation(float DamageAmount
 	
 	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
 	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);
+	OnDamageTaken.Broadcast();
 	
 	if (CurrentHealth <= 0.0f)
 	{

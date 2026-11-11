@@ -25,6 +25,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReloading, float, CurrentAmmo, f
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShoot, float, CurrentAmmo, float, ReserveAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDoubleDamageChanged, int32, SecondsRemaining, bool, IsActive);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReserveAmmoChanged, int32, NewReserveAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamageTaken);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -187,6 +188,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="Ammo")
 	FOnReserveAmmoChanged OnReserveAmmoChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="Weapon")
+	FOnDamageTaken OnDamageTaken;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	int32 MaxHealth = 200;

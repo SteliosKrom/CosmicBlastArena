@@ -6,12 +6,15 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 #include "Components/CanvasPanel.h"
 #include "CosmicBlastArenaCharacter.h"
 #include "PlayerHUD.generated.h"
 
 class UProgressBar;
 class UTextBlock;
+class UImage;
+class UWidgetAnimation;
 
 UCLASS()
 class COSMICBLASTARENA_API UPlayerHUD : public UUserWidget
@@ -63,6 +66,12 @@ public:
 	UPROPERTY()
 	TObjectPtr<UTextBlock>PlayerTwoWinsTextBlock;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> DamageEffect;
+	
+	UPROPERTY(Transient, meta=(BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> DamageAnimation;
+	
 	UPROPERTY()
 	TObjectPtr<ACosmicBlastArenaCharacter> PlayerCharacter;
 	
@@ -92,6 +101,9 @@ public:
 	
 	UFUNCTION()
 	void UpdateReserveAmmoUI(int32 NewReserveAmmo);
+	
+	UFUNCTION()
+	void ShowDamageOverlay();
 	
 	UFUNCTION()
 	void ShowReloadingUI();
