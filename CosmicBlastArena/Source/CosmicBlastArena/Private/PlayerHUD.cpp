@@ -142,3 +142,27 @@ void UPlayerHUD::HideRoundAnnouncementUI()
 	if (!IsValid(RoundIntroTextBlock)) return;
 	RoundIntroTextBlock->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UPlayerHUD::ShowPlayerOneWinsUI()
+{
+	if (!IsValid(PlayerOneWinsTextBlock)) return;
+	PlayerOneWinsTextBlock->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UPlayerHUD::HidePlayerOneWinsUI()
+{
+	if (!IsValid(PlayerOneWinsTextBlock)) return;
+	PlayerOneWinsTextBlock->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UPlayerHUD::ShowPlayerTwoWinsUI()
+{
+	if (!IsValid(PlayerTwoWinsTextBlock)) return;
+	PlayerTwoWinsTextBlock->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UPlayerHUD::HidePlayerTwoWinsUI()
+{
+	if (!IsValid(PlayerTwoWinsTextBlock)) return;
+	PlayerTwoScoreTextBlock->SetVisibility(ESlateVisibility::Hidden);
+}

@@ -179,19 +179,30 @@ void ACosmicBlastArenaGameMode::HandlePlayerDeath()
 
 void ACosmicBlastArenaGameMode::EndGame()
 {
+	bGameEnded = true;
+	
 	PlayerHUD->HideGameplayHUD();
 	PlayerHUDTwo->HideGameplayHUD();
 	
 	if (PlayerOneScore == 2)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player 1 wins!"));
+		PlayerHUD->ShowPlayerOneWinsUI();
+		PlayerHUDTwo->ShowPlayerOneWinsUI();
 	}
 	
 	if (PlayerTwoScore == 2)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player 2 wins!"));
+		PlayerHUD->ShowPlayerTwoWinsUI();
+		PlayerHUDTwo->ShowPlayerTwoWinsUI();
 	}
 	
+	GetWorldTimerManager().SetTimer(BackToMenuHandle, this, &ACosmicBlastArenaGameMode::BackToMenu, 5.0f, false);
+}
+
+void ACosmicBlastArenaGameMode::BackToMenu()
+{
 	if (IsValid(PlayerTwoController))
 	{
 		UGameplayStatics::RemovePlayer(PlayerTwoController, true);
