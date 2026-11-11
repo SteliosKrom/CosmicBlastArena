@@ -58,6 +58,12 @@ public:
 	TObjectPtr<UTextBlock> PlayerTwoScoreTextBlock;
 	
 	UPROPERTY()
+	TObjectPtr<UTextBlock> PlayerOneWinsTextBlock;
+	
+	UPROPERTY()
+	TObjectPtr<UTextBlock>PlayerTwoWinsTextBlock;
+	
+	UPROPERTY()
 	TObjectPtr<ACosmicBlastArenaCharacter> PlayerCharacter;
 	
 	UFUNCTION()
@@ -104,4 +110,16 @@ public:
 	
 	UFUNCTION()
 	void HideRoundAnnouncementUI();
+	
+	UFUNCTION()
+	void ShowPlayerOneWinsUI();
+	
+	UFUNCTION()
+	void HidePlayerOneWinsUI();
+	
+	UFUNCTION()
+	void ShowPlayerTwoWinsUI();
+	
+	UFUNCTION()
+	void HidePlayerTwoWinsUI();
 };
