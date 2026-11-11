@@ -129,7 +129,8 @@ void ACosmicBlastArenaGameMode::EndRound()
 	PlayerHUD->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
 	PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
 	
-	GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, &ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
+	GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, 
+		&ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
 }
 
 void ACosmicBlastArenaGameMode::RestartLevel()
@@ -142,7 +143,8 @@ void ACosmicBlastArenaGameMode::RestartLevel()
 	MyGameInstance->PlayerTwoScore = PlayerTwoScore;
 	MyGameInstance->CurrentRound = CurrentRound;
 	
-	UGameplayStatics::OpenLevel(this, *UGameplayStatics::GetCurrentLevelName(this, true));
+	UGameplayStatics::OpenLevel(this, 
+		*UGameplayStatics::GetCurrentLevelName(this, true));
 }
 
 void ACosmicBlastArenaGameMode::HandlePlayerDeath()
@@ -172,7 +174,8 @@ void ACosmicBlastArenaGameMode::HandlePlayerDeath()
 		
 		if (bRoundFinished == true)
 		{
-			GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, &ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
+			GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, 
+				&ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
 		}
 	}
 }
@@ -198,16 +201,12 @@ void ACosmicBlastArenaGameMode::EndGame()
 		PlayerHUDTwo->ShowPlayerTwoWinsUI();
 	}
 	
-	GetWorldTimerManager().SetTimer(BackToMenuHandle, this, &ACosmicBlastArenaGameMode::BackToMenu, 5.0f, false);
+	GetWorldTimerManager().SetTimer(BackToMenuHandle, this, 
+		&ACosmicBlastArenaGameMode::BackToMenu, 5.0f, false);
 }
 
 void ACosmicBlastArenaGameMode::BackToMenu()
 {
-	if (IsValid(PlayerTwoController))
-	{
-		UGameplayStatics::RemovePlayer(PlayerTwoController, true);
-	}
-	
 	UGameplayStatics::OpenLevel(this, FName("MainMenu"));
 }
 
@@ -231,7 +230,8 @@ void ACosmicBlastArenaGameMode::ShowRoundIntro()
 {
 	PlayerHUD->ShowRoundAnnouncementUI();
 	PlayerHUDTwo->ShowRoundAnnouncementUI();
-	GetWorldTimerManager().SetTimer(RoundIntroHandle, this, &ACosmicBlastArenaGameMode::StartRound, 3.0f, false);
+	GetWorldTimerManager().SetTimer(RoundIntroHandle, this, 
+		&ACosmicBlastArenaGameMode::StartRound, 3.0f, false);
 }
 
 
