@@ -36,6 +36,7 @@ public:
 	FTimerHandle RoundIntroHandle;
 	FTimerHandle EndRoundHandle;
 	FTimerHandle RoundTransitionTimer;
+	FTimerHandle BackToMenuHandle;
 	
 	int32 PlayerOneScore = 0;
 	int32 PlayerTwoScore = 0;
@@ -70,6 +71,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere)
 	bool bRoundFinished = false;
+	
+	UPROPERTY(VisibleAnywhere)
+	bool bGameEnded = false;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Timer")
 	float RoundTimeRemaining;
@@ -106,6 +110,9 @@ public:
 	
 	UFUNCTION()
 	void ResetScore();
+	
+	UFUNCTION()
+	void BackToMenu();
 };
 
 
