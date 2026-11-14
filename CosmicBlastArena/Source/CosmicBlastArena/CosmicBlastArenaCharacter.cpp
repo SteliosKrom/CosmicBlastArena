@@ -14,11 +14,13 @@
 #include "InputActionValue.h"
 #include "CosmicBlastArena.h"
 #include "DrawDebugHelpers.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerHUD.h"
 #include "ArenaAnimInstance.h"
+#include "GrenadeProjectile.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -110,6 +112,8 @@ void ACosmicBlastArenaCharacter::Tick(float DeltaTime)
 		}
 		Timer = 0.0f;
 	}
+	
+	ApplyDissolveEffect(DeltaTime);
 	
 	if (!IsValid(WeaponMesh)) return;
 	if (!IsValid(FollowCamera)) return;
@@ -404,6 +408,7 @@ void ACosmicBlastArenaCharacter::OnThrowHold()
 	bIsThrowing = true;
 	bIsGrenadeHolding = true;
 	AnimInstance->Montage_Pause(ThrowMontage);
+	SpawnGrenade();
 	
 	if (GEngine)
 	{
@@ -448,6 +453,23 @@ void ACosmicBlastArenaCharacter::OnThrowFinished()
 	bThrowButtonHeld = false;
 }
 
+void ACosmicBlastArenaCharacter::SpawnGrenade()
+{
+	if (IsValid(GrenadeProjectile)) return;
+	if (!IsValid(GrenadeProjectileClass)) return;
+	
+	const FTransform SpawnTransform = GetMesh()->GetSocketTransform(FName(TEXT("GrenadeSocket")));
+	FVector SpawnLocation = SpawnTransform.GetLocation();
+	FRotator SpawnRotation = SpawnTransform.Rotator();
+	
+	GrenadeProjectile = GetWorld()->SpawnActor<AGrenadeProjectile>(GrenadeProjectileClass, SpawnLocation, SpawnRotation);
+	
+	if (!IsValid(GrenadeProjectile)) return;
+	
+	GrenadeProjectile->AttachToComponent(GetMesh(), 
+		FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("GrenadeSocket")));
+}
+
 void ACosmicBlastArenaCharacter::OnAimStarted(const FInputActionValue& Value)
 {
 	if (bIsDead == true) return;
@@ -475,6 +497,43 @@ void ACosmicBlastArenaCharacter::OnAimReleased(const FInputActionValue& Value)
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Aim ended!"));
+	}
+}
+
+void ACosmicBlastArenaCharacter::InitializeDissolveMaterials()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Dissolve Notify Triggered!"));
+	
+	if (!IsValid(GetMesh())) return;
+	
+	MaterialCount = GetMesh()->GetNumMaterials();
+	UE_LOG(LogTemp, Warning, TEXT("Material Count: %d"), MaterialCount);
+	
+	for (int32 i = 0; i < MaterialCount; i++)
+	{
+		DynamicMaterial = GetMesh()->CreateDynamicMaterialInstance(i, DissolveMaterialBase);
+		
+		if (IsValid(DynamicMaterial))
+		{
+			DissolveMaterials.Add(DynamicMaterial);
+		}
+	}
+}
+
+void ACosmicBlastArenaCharacter::ApplyDissolveEffect(float DeltaTime)
+{
+	if (bIsDissolving == true)
+	{
+		CurrentDissolve += DissolveSpeed * DeltaTime;
+		
+		for (int32 i = 0; i < DissolveMaterials.Num(); i++)
+		{
+			if (IsValid(DissolveMaterials[i]))
+			{
+				DissolveMaterials[i]->SetScalarParameterValue(TEXT("DissolveAmount"), CurrentDissolve);
+				UE_LOG(LogTemp, Warning, TEXT("Current Dissolve: %f"), CurrentDissolve);
+			}
+		}
 	}
 }
 

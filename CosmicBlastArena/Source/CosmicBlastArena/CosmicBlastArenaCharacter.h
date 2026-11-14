@@ -16,7 +16,9 @@ class USkeletalMeshComponent;
 class UAnimMontage;
 class UUserWidget;
 class UPlayerHUD;
+class UMaterialInstanceDynamic;
 class ACosmicBlastArenaGameMode;
+class AGrenadeProjectile;
 
 struct FInputActionValue;
 
@@ -67,11 +69,23 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 	
+	UPROPERTY(EditDefaultsOnly, Category="Dissolve")
+	TObjectPtr<UMaterialInterface> DissolveMaterialBase;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh = nullptr;
+	
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Grenade")
+	TSubclassOf<AGrenadeProjectile> GrenadeProjectileClass;
+	
+	UPROPERTY()
+	TObjectPtr<AGrenadeProjectile> GrenadeProjectile;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="UI")
 	TSubclassOf<UUserWidget> PlayerHUDClass;
@@ -137,7 +151,11 @@ protected:
 	float Timer = 0.0f;
 	float DamageMultiplier = 1.0f;
 	
+	float CurrentDissolve = 0.0f;
+	float DissolveSpeed = 0.5f;
+	
 	int32 DoubleDamageSecondsRemaining;
+	int32 MaterialCount;
 	
 	FTimerHandle ShootingTimerHandle;
 	FTimerHandle DamageMultiplierTimerHandle;
@@ -165,11 +183,17 @@ public:
 	
 	void UpdateDoubleDamageCountdown();
 	
+	void InitializeDissolveMaterials();
+	
+	void ApplyDissolveEffect(float DeltaTime);
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	virtual void ReceiveDamage_Implementation(float DamageAmount) override;
 	
 	virtual bool IsAlive_Implementation() override;
+	
+	bool bIsDissolving = false;
 	
 	UPROPERTY()
 	TObjectPtr<ACosmicBlastArenaGameMode> GameMode;
@@ -246,6 +270,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player")
 	bool bIsMoving = false;
 	
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<UMaterialInstanceDynamic>> DissolveMaterials;
+	
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoMove(float Right, float Forward);
 	
@@ -260,6 +287,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Health")
 	void Die();
+	
+	UFUNCTION()
+	void SpawnGrenade();
 	
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	

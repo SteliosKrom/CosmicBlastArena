@@ -43,7 +43,7 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 	
 	if (PlayerTwoCharacter)
 	{
-		PlayerTwoCharacter->GetMesh()->SetMaterial(1, PlayerTwoMaterial);
+		PlayerTwoCharacter->GetMesh()->SetMaterial(0, PlayerTwoMaterial);
 	}
 	
 	RoundTimeRemaining = RoundDuration;
@@ -130,7 +130,7 @@ void ACosmicBlastArenaGameMode::EndRound()
 	PlayerHUDTwo->UpdateScoreUI(PlayerOneScore, PlayerTwoScore);
 	
 	GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, 
-		&ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
+		&ACosmicBlastArenaGameMode::StartNextRound, 6.0f, false);
 }
 
 void ACosmicBlastArenaGameMode::RestartLevel()
@@ -175,7 +175,7 @@ void ACosmicBlastArenaGameMode::HandlePlayerDeath()
 		if (bRoundFinished == true)
 		{
 			GetWorldTimerManager().SetTimer(RoundTransitionTimer, this, 
-				&ACosmicBlastArenaGameMode::StartNextRound, 5.0f, false);
+				&ACosmicBlastArenaGameMode::StartNextRound, 6.0f, false);
 		}
 	}
 }
@@ -202,7 +202,7 @@ void ACosmicBlastArenaGameMode::EndGame()
 	}
 	
 	GetWorldTimerManager().SetTimer(BackToMenuHandle, this, 
-		&ACosmicBlastArenaGameMode::BackToMenu, 5.0f, false);
+		&ACosmicBlastArenaGameMode::BackToMenu, 6.0f, false);
 }
 
 void ACosmicBlastArenaGameMode::BackToMenu()
