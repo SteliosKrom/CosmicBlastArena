@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AudioManager.h"
 #include "Damageable.h"
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
@@ -19,6 +20,7 @@ class UPlayerHUD;
 class UMaterialInstanceDynamic;
 class ACosmicBlastArenaGameMode;
 class AGrenadeProjectile;
+class UAudioManager;
 
 struct FInputActionValue;
 
@@ -194,6 +196,9 @@ public:
 	virtual bool IsAlive_Implementation() override;
 	
 	bool bIsDissolving = false;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioManager> AudioManager;
 	
 	UPROPERTY()
 	TObjectPtr<ACosmicBlastArenaGameMode> GameMode;

@@ -20,6 +20,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerHUD.h"
 #include "ArenaAnimInstance.h"
+#include "AudioManager.h"
 #include "GrenadeProjectile.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
@@ -84,6 +85,7 @@ void ACosmicBlastArenaCharacter::BeginPlay()
 	
 	GameMode = Cast<ACosmicBlastArenaGameMode>(GetWorld()->GetAuthGameMode());
 	WeaponMesh = FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("WeaponMesh")));
+	AudioManager = GameMode->FindComponentByClass<UAudioManager>();
 
 	if (!IsValid(WeaponMesh) || !WeaponMesh->DoesSocketExist(FName(TEXT("Muzzle"))))
 	{
@@ -266,6 +268,8 @@ void ACosmicBlastArenaCharacter::Shoot()
 	if (GameMode->bGameEnded == true) return;
 	
 	UE_LOG(LogTemp, Display, TEXT("Shoot pressed!"));
+	
+	AudioManager->PlaySFX(AudioManager->ShootingSound);
 	
 	CurrentAmmo = FMath::Clamp(CurrentAmmo - 1, 0, 30);
 	SpendAmmoCount++;

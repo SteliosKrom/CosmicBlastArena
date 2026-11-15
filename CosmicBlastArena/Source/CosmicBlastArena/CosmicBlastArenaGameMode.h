@@ -10,6 +10,7 @@
 class UMaterialInterface;
 class UPlayerHUD;
 class APlayerStart;
+class UAudioManager;
 
 /**
  *  Simple GameMode for a third person game
