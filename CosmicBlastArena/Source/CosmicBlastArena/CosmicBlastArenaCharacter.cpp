@@ -202,6 +202,7 @@ void ACosmicBlastArenaCharacter::Die()
 	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();
 	GameMode->HandlePlayerDeath();
+	AudioManager->PlaySFX(AudioManager->DeathSound);
 }
 
 bool ACosmicBlastArenaCharacter::IsAlive_Implementation()
@@ -371,6 +372,7 @@ void ACosmicBlastArenaCharacter::Reload(const FInputActionValue& Value)
 		bIsReloading = true;
 		AnimInstance->Montage_Play(ReloadMontage);
 		HUD->ShowReloadingUI();
+		AudioManager->PlaySFX(AudioManager->ReloadSound);
 	}
 }
 

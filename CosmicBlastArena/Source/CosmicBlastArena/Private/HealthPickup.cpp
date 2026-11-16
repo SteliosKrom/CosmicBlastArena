@@ -2,10 +2,18 @@
 
 #include "HealthPickup.h"
 #include "CosmicBlastArenaCharacter.h"
+#include "CosmicBlastArenaGameMode.h"
 
 AHealthPickup::AHealthPickup()
 {
 	
+}
+
+void AHealthPickup::BeginPlay()
+{
+	Super::BeginPlay();
+	GameMode = Cast<ACosmicBlastArenaGameMode>(GetWorld()->GetAuthGameMode());
+	AudioManager = GameMode->FindComponentByClass<UAudioManager>();
 }
 
 void AHealthPickup::ApplyPickupEffect(ACosmicBlastArenaCharacter* ArenaCharacter)
@@ -19,6 +27,7 @@ void AHealthPickup::ApplyPickupEffect(ACosmicBlastArenaCharacter* ArenaCharacter
 		}
 		ArenaCharacter->CurrentHealth = FMath::Min(ArenaCharacter->CurrentHealth + ArenaCharacter->HealthBoost, ArenaCharacter->MaxHealth);
 		ArenaCharacter->OnHealthChanged.Broadcast(ArenaCharacter->CurrentHealth, ArenaCharacter->MaxHealth);
+		AudioManager->PlaySFX(AudioManager->PickupSound);
 		Destroy();
 	}
 }

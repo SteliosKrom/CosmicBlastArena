@@ -19,6 +19,7 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 	Super::BeginPlay();
 	
 	UCosmicBlastArenaGameInstance* MyGameInstance = Cast<UCosmicBlastArenaGameInstance>(GetGameInstance());
+	AudioManager = this->FindComponentByClass<UAudioManager>();
 	
 	if (!IsValid(MyGameInstance)) return;
 	
@@ -98,6 +99,8 @@ void ACosmicBlastArenaGameMode::StartRound()
 	PlayerHUDTwo->ShowGameplayHUD();
 	
 	bRoundStarted = true;
+	
+	AudioManager->PlayBattleMusic();
 }
 
 void ACosmicBlastArenaGameMode::EndRound()
@@ -233,5 +236,3 @@ void ACosmicBlastArenaGameMode::ShowRoundIntro()
 	GetWorldTimerManager().SetTimer(RoundIntroHandle, this, 
 		&ACosmicBlastArenaGameMode::StartRound, 3.0f, false);
 }
-
-

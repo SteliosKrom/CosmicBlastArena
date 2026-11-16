@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "PlayerHUD.h"
+#include "AudioManager.h"
 #include "CosmicBlastArenaGameMode.generated.h"
 
 class UMaterialInterface;
@@ -42,6 +43,9 @@ public:
 	int32 PlayerOneScore = 0;
 	int32 PlayerTwoScore = 0;
 	int32 CurrentRound = 1;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioManager> AudioManager;
 	
 	UPROPERTY()
 	TObjectPtr<UPlayerHUD> PlayerHUD; 

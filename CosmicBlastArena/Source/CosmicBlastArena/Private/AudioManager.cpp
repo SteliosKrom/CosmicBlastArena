@@ -11,18 +11,22 @@ UAudioManager::UAudioManager()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 // Called when the game starts
 void UAudioManager::BeginPlay()
 {
 	Super::BeginPlay();
-	PlayBattleMusic();
 }
 
 // Called every frame
 void UAudioManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UAudioManager::PlayMenuMusic()
+{
+	if (!IsValid(MenuMusic)) return;
+	UGameplayStatics::SpawnSound2D(this, MenuMusic);
 }
 
 void UAudioManager::PlayBattleMusic()

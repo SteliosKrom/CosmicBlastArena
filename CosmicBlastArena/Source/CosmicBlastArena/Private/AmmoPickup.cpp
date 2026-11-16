@@ -2,10 +2,18 @@
 
 #include "AmmoPickup.h"
 #include "CosmicBlastArenaCharacter.h"
+#include "CosmicBlastArenaGameMode.h"
 
 AAmmoPickup::AAmmoPickup()
 {
 	
+}
+
+void AAmmoPickup::BeginPlay()
+{
+	Super::BeginPlay();
+	GameMode = Cast<ACosmicBlastArenaGameMode>(GetWorld()->GetAuthGameMode());
+	AudioManager = GameMode->FindComponentByClass<UAudioManager>();
 }
 
 void AAmmoPickup::ApplyPickupEffect(ACosmicBlastArenaCharacter* ArenaCharacter)
@@ -20,6 +28,7 @@ void AAmmoPickup::ApplyPickupEffect(ACosmicBlastArenaCharacter* ArenaCharacter)
 		
 		ArenaCharacter->ReserveAmmo = FMath::Min(ArenaCharacter->ReserveAmmo + ArenaCharacter->AmmoBoost, ArenaCharacter->MaxReserveAmmo);
 		ArenaCharacter->OnReserveAmmoChanged.Broadcast(ArenaCharacter->ReserveAmmo);
+		AudioManager->PlaySFX(AudioManager->PickupSound);
 		Destroy();
 	}
 }

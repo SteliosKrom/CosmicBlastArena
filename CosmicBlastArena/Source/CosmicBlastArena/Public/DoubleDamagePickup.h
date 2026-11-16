@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AudioManager.h"
 #include "PickupBase.h"
 #include "DoubleDamagePickup.generated.h"
+
+class UAudioManager;
+class ACosmicBlastArenaGameMode;
 
 UCLASS()
 class COSMICBLASTARENA_API ADoubleDamagePickup : public APickupBase
@@ -13,7 +17,15 @@ class COSMICBLASTARENA_API ADoubleDamagePickup : public APickupBase
 	
 public: 
 	
+	virtual void BeginPlay() override;
+	
 	ADoubleDamagePickup();
 	
 	void ApplyPickupEffect(ACosmicBlastArenaCharacter* Character) override;
+	
+	UPROPERTY()
+	TObjectPtr<ACosmicBlastArenaGameMode> GameMode;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioManager> AudioManager;
 };

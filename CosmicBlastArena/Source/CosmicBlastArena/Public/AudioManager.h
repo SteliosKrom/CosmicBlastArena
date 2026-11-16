@@ -26,6 +26,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Audio")
+	TObjectPtr<USoundBase> MenuMusic;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Audio")
 	TObjectPtr<USoundBase> BattleMusic;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="SFX")
@@ -39,6 +42,12 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="SFX")
 	TObjectPtr<USoundBase> GrenadeSound;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="SFX")
+	TObjectPtr<USoundBase> ReloadSound;
+	
+	UFUNCTION(BlueprintCallable, Category="Audio")
+	void PlayMenuMusic();
 	
 	UFUNCTION(BlueprintCallable, Category="Audio")
 	void PlayBattleMusic();
