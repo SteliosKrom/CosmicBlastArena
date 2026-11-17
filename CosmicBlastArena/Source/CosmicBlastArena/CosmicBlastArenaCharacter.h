@@ -179,6 +179,8 @@ public:
 	
 	void OnThrowFinished();
 	
+	void ThrowGrenade();
+	
 	void ActivateDoubleDamage();
 	
 	void ResetDoubleDamage();

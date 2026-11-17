@@ -22,6 +22,7 @@
 #include "ArenaAnimInstance.h"
 #include "AudioManager.h"
 #include "GrenadeProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -86,7 +87,7 @@ void ACosmicBlastArenaCharacter::BeginPlay()
 	GameMode = Cast<ACosmicBlastArenaGameMode>(GetWorld()->GetAuthGameMode());
 	WeaponMesh = FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("WeaponMesh")));
 	AudioManager = GameMode->FindComponentByClass<UAudioManager>();
-
+	
 	if (!IsValid(WeaponMesh) || !WeaponMesh->DoesSocketExist(FName(TEXT("Muzzle"))))
 	{
 		UE_LOG(LogTemp, Error, TEXT("WeaponMesh or Muzzle not found!"));
@@ -285,11 +286,8 @@ void ACosmicBlastArenaCharacter::Shoot()
 	
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
-	
-	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
-	const FVector TraceEnd = bHit ? HitResult.ImpactPoint : End;
-	
-	if (bHit)
+
+	if (const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams))
 	{
 		AActor* HitActor = HitResult.GetActor();
 		
@@ -304,9 +302,7 @@ void ACosmicBlastArenaCharacter::Shoot()
 				Damage = FMath::RandRange(7, 13);
 			
 			const float FinalDamage = Damage * DamageMultiplier;
-			
 			IDamageable::Execute_ReceiveDamage(HitActor, FinalDamage);
-			DrawDebugPoint(GetWorld(), TraceEnd, 50.0f, FColor::Red, false, 2.0f);
 		}
 		else
 		{
@@ -334,7 +330,8 @@ void ACosmicBlastArenaCharacter::ActivateDoubleDamage()
 	DamageMultiplier = 2.0f;
 	DoubleDamageSecondsRemaining = 10;
 	OnDoubleDamageChanged.Broadcast(DoubleDamageSecondsRemaining, true);
-	GetWorldTimerManager().SetTimer(DamageMultiplierTimerHandle, this, &ACosmicBlastArenaCharacter::UpdateDoubleDamageCountdown, 1.0f, true);
+	GetWorldTimerManager().SetTimer(DamageMultiplierTimerHandle, this, 
+		&ACosmicBlastArenaCharacter::UpdateDoubleDamageCountdown, 1.0f, true);
 }
 
 void ACosmicBlastArenaCharacter::ResetDoubleDamage()
@@ -396,6 +393,8 @@ void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
 	bIsThrowing = true;
 	
 	AnimInstance->Montage_Play(ThrowMontage);
+	SpawnGrenade();
+	WeaponMesh->SetVisibility(false);
 	
 	if (GEngine)
 	{
@@ -414,7 +413,6 @@ void ACosmicBlastArenaCharacter::OnThrowHold()
 	bIsThrowing = true;
 	bIsGrenadeHolding = true;
 	AnimInstance->Montage_Pause(ThrowMontage);
-	SpawnGrenade();
 	
 	if (GEngine)
 	{
@@ -439,6 +437,7 @@ void ACosmicBlastArenaCharacter::OnThrowReleased(const FInputActionValue& Value)
 		bIsThrowing = false;
 		CurrentGrenade = FMath::Clamp(CurrentGrenade - 1, 0, MaxGrenades);
 		HUD->UpdateGrenadesUI(CurrentGrenade);
+		ThrowGrenade();
 	}
 	else
 	{
@@ -459,6 +458,19 @@ void ACosmicBlastArenaCharacter::OnThrowFinished()
 	bThrowButtonHeld = false;
 }
 
+void ACosmicBlastArenaCharacter::ThrowGrenade() 
+{
+	GrenadeProjectile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	GrenadeProjectile->ProjectileMovement->Activate();
+		
+	FVector Direction = FollowCamera->GetForwardVector();
+	FVector Velocity = Direction * GrenadeProjectile->ProjectileMovement->InitialSpeed;
+		
+	GrenadeProjectile->ProjectileMovement->Velocity = Velocity;
+	GrenadeProjectile = nullptr;
+	WeaponMesh->SetVisibility(true);
+}
+
 void ACosmicBlastArenaCharacter::SpawnGrenade()
 {
 	if (IsValid(GrenadeProjectile)) return;
@@ -468,7 +480,12 @@ void ACosmicBlastArenaCharacter::SpawnGrenade()
 	FVector SpawnLocation = SpawnTransform.GetLocation();
 	FRotator SpawnRotation = SpawnTransform.Rotator();
 	
-	GrenadeProjectile = GetWorld()->SpawnActor<AGrenadeProjectile>(GrenadeProjectileClass, SpawnLocation, SpawnRotation);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = this;
+	
+	GrenadeProjectile = GetWorld()->SpawnActor<AGrenadeProjectile>(GrenadeProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	GrenadeProjectile->ProjectileMovement->Deactivate();
 	
 	if (!IsValid(GrenadeProjectile)) return;
 	
