@@ -22,7 +22,9 @@
 #include "ArenaAnimInstance.h"
 #include "AudioManager.h"
 #include "GrenadeProjectile.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ACosmicBlastArenaCharacter::ACosmicBlastArenaCharacter()
 {
@@ -395,6 +397,8 @@ void ACosmicBlastArenaCharacter::OnThrowPrepare(const FInputActionValue& Value)
 	AnimInstance->Montage_Play(ThrowMontage);
 	SpawnGrenade();
 	WeaponMesh->SetVisibility(false);
+	GrenadeProjectile->GrenadeMesh->SetVisibility(true);
+	GrenadeProjectile->CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	
 	if (GEngine)
 	{
@@ -443,6 +447,8 @@ void ACosmicBlastArenaCharacter::OnThrowReleased(const FInputActionValue& Value)
 	{
 		bIsThrowing = false;
 		AnimInstance->Montage_Stop(0.2f, ThrowMontage);
+		GrenadeProjectile->Destroy();
+		WeaponMesh->SetVisibility(true);
 	}
 	
 	if (GEngine)
@@ -465,10 +471,41 @@ void ACosmicBlastArenaCharacter::ThrowGrenade()
 		
 	FVector Direction = FollowCamera->GetForwardVector();
 	FVector Velocity = Direction * GrenadeProjectile->ProjectileMovement->InitialSpeed;
-		
+	
 	GrenadeProjectile->ProjectileMovement->Velocity = Velocity;
+	ThrownGrenade = GrenadeProjectile;
 	GrenadeProjectile = nullptr;
+	ThrownGrenade->CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	WeaponMesh->SetVisibility(true);
+	
+	GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &ACosmicBlastArenaCharacter::Explode, 3.0f, false);
+}
+
+float ACosmicBlastArenaCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, 
+	AActor* DamageCauser)
+{
+	if (this->Implements<UDamageable>())
+	{
+		if (IDamageable::Execute_IsAlive(this))
+		{
+			IDamageable::Execute_ReceiveDamage(this, DamageAmount);
+			return DamageAmount;
+		}
+	}
+	return 0;
+}
+
+void ACosmicBlastArenaCharacter::Explode()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Explode started!"));
+	
+	UGameplayStatics::ApplyRadialDamage(GetWorld(),ThrownGrenade->ExplosionDamage, ThrownGrenade->GetActorLocation(),
+		ThrownGrenade->ExplosionRadius, UDamageType::StaticClass(), TArray<AActor*>(), ThrownGrenade, GetController(), 
+		false);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Current Health: %d"), this->CurrentHealth);
+	
+	ThrownGrenade->Destroy();
 }
 
 void ACosmicBlastArenaCharacter::SpawnGrenade()

@@ -17,6 +17,8 @@ AGrenadeProjectile::AGrenadeProjectile()
 	GrenadeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GrenadeMesh"));
 	GrenadeMesh->SetupAttachment(RootComponent);
 	
+	GrenadeMesh->SetSimulatePhysics(false);
+	
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	
 	ProjectileMovement->InitialSpeed = 1200.0f;
