@@ -50,6 +50,8 @@ protected:
 	
 	virtual void PossessedBy(AController* NewController) override;
 	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
 	void Move(const FInputActionValue& Value);
 	
 	void OnMoveCompleted(const FInputActionValue& Value);
@@ -85,6 +87,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Grenade")
 	TSubclassOf<AGrenadeProjectile> GrenadeProjectileClass;
+	
+	UPROPERTY()
+	TObjectPtr<AGrenadeProjectile> ThrownGrenade;
 	
 	UPROPERTY()
 	TObjectPtr<AGrenadeProjectile> GrenadeProjectile;
@@ -161,6 +166,7 @@ protected:
 	
 	FTimerHandle ShootingTimerHandle;
 	FTimerHandle DamageMultiplierTimerHandle;
+	FTimerHandle ExplosionTimerHandle;
 	
 public:
 
@@ -180,6 +186,8 @@ public:
 	void OnThrowFinished();
 	
 	void ThrowGrenade();
+	
+	void Explode();
 	
 	void ActivateDoubleDamage();
 	

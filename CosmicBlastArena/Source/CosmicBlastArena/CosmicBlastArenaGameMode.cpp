@@ -56,7 +56,7 @@ void ACosmicBlastArenaGameMode::BeginPlay()
 	
 	if (!IsValid(CharacterOne) || !IsValid(CharacterTwo)) return;
 	
-	PlayerHUD = CharacterOne-> GetPlayerHUD();
+	PlayerHUD = CharacterOne->GetPlayerHUD();
 	PlayerHUDTwo = CharacterTwo->GetPlayerHUD();
 	
 	if (!IsValid(PlayerHUD) || !IsValid(PlayerHUDTwo)) return;

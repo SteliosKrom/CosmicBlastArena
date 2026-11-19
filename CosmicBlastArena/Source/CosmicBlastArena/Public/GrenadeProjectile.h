@@ -22,17 +22,22 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	
+	float ExplosionRadius = 100.0f;
+	float ExplosionDamage = 100.0f;
+	
+	bool bHasExploded = false;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UStaticMeshComponent> GrenadeMesh;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USphereComponent> CollisionSphere;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 	
